@@ -1,0 +1,3340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Ekspedisi Planet Lingkaran</title>
+  <style>
+    :root{
+      --navy:#16213E;
+      --navy2:#0E1630;
+      --blue:#39A7FF;
+      --purple:#7B61FF;
+      --yellow:#FFD166;
+      --white:#F8FBFF;
+      --card:#FFFFFF;
+      --text:#182033;
+      --muted:#65728A;
+      --ok:#2EAD6B;
+      --bad:#D94B5B;
+      --soft:#EDF5FF;
+      --border:#D8E6F7;
+      --shadow:0 10px 30px rgba(10,27,62,.12);
+      --radius:22px;
+      --header-h:78px;
+      --nav-h:78px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      height:100%;
+      overflow:hidden;
+      font-family:Inter,Poppins,"Segoe UI",Arial,sans-serif;
+      background:linear-gradient(160deg,var(--navy2),var(--navy));
+      color:var(--text);
+    }
+    button,input,select{font:inherit}
+    button{touch-action:manipulation}
+    .app{
+      height:100dvh;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
+    }
+    .stars::before,.stars::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,.55) 0 1px, transparent 2px),
+        radial-gradient(circle at 70% 15%, rgba(255,255,255,.45) 0 1.2px, transparent 2px),
+        radial-gradient(circle at 35% 60%, rgba(255,255,255,.35) 0 1px, transparent 2px),
+        radial-gradient(circle at 90% 70%, rgba(255,255,255,.45) 0 1.2px, transparent 2px),
+        radial-gradient(circle at 55% 85%, rgba(255,255,255,.35) 0 1px, transparent 2px);
+      background-size:220px 220px;
+      opacity:.45;
+    }
+    .app-header{
+      min-height:var(--header-h);
+      background:rgba(14,22,48,.94);
+      color:white;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 16px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      z-index:20;
+      flex:0 0 auto;
+    }
+    .header-icon{
+      width:46px;height:46px;border-radius:50%;
+      display:grid;place-items:center;
+      background:linear-gradient(145deg,var(--purple),var(--blue));
+      box-shadow:0 6px 20px rgba(57,167,255,.25);
+      font-size:24px;
+      flex:0 0 auto;
+    }
+    .header-main{min-width:0;flex:1}
+    .header-title{
+      font-size:clamp(16px,2.4vw,22px);
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .header-meta{
+      margin-top:3px;
+      font-size:12px;
+      color:#C9D7F1;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    #headerCloud{
+      color:#BFE0FF;
+      white-space:nowrap;
+    }
+    .header-progress{
+      width:min(170px,28vw);
+      min-width:90px;
+    }
+    .progress-track{
+      width:100%;height:9px;border-radius:99px;
+      background:rgba(255,255,255,.17);
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,var(--yellow),#FFE7A7);
+      border-radius:99px;
+      transition:width .25s ease;
+    }
+    .content-wrap{
+      flex:1;
+      min-height:0;
+      position:relative;
+      z-index:2;
+    }
+    .content-scroll{
+      height:100%;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:20px 16px calc(var(--nav-h) + 42px);
+      scroll-behavior:smooth;
+    }
+    .content-scroll.no-nav{padding-bottom:20px}
+    .page{
+      width:min(980px,100%);
+      margin:0 auto;
+      animation:fadeUp .22s ease;
+    }
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(6px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .hero{
+      color:white;
+      text-align:center;
+      padding:16px 0 8px;
+    }
+    .hero h1{
+      font-size:clamp(30px,7vw,56px);
+      line-height:1.04;
+      margin:10px 0 10px;
+    }
+    .hero p{
+      margin:0 auto;
+      max-width:680px;
+      color:#DCE8FF;
+      font-size:clamp(15px,2vw,19px);
+      line-height:1.55;
+    }
+    .planet-logo{
+      width:118px;height:118px;margin:4px auto 8px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 35% 30%,#B8E4FF 0 5%,transparent 6%),
+        radial-gradient(circle at 64% 60%,rgba(255,255,255,.38) 0 9%,transparent 10%),
+        linear-gradient(145deg,#7B61FF,#39A7FF);
+      box-shadow:
+        0 0 0 14px rgba(123,97,255,.11),
+        0 0 50px rgba(57,167,255,.25);
+      position:relative;
+      display:grid;
+      place-items:center;
+      font-size:48px;
+    }
+    .planet-logo::after{
+      content:"";
+      position:absolute;
+      width:150px;height:38px;
+      border:5px solid rgba(255,209,102,.85);
+      border-radius:50%;
+      transform:rotate(-16deg);
+    }
+    .card{
+      background:var(--card);
+      border:1px solid rgba(216,230,247,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:14px;
+    }
+    .card-title{
+      margin:0 0 10px;
+      font-size:clamp(19px,2.4vw,25px);
+      color:var(--navy);
+      font-weight:800;
+    }
+    .subtle{color:var(--muted);line-height:1.55}
+    .field{margin:14px 0}
+    label{display:block;font-weight:800;margin-bottom:7px;color:var(--navy)}
+    input[type="text"],input[type="number"],select{
+      width:100%;
+      min-height:52px;
+      border:2px solid var(--border);
+      border-radius:15px;
+      padding:12px 14px;
+      background:#FBFDFF;
+      color:var(--text);
+      outline:none;
+    }
+    input:focus,select:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px rgba(57,167,255,.12);
+    }
+    .btn{
+      border:none;
+      border-radius:16px;
+      min-height:52px;
+      padding:12px 18px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .12s ease,opacity .12s ease,box-shadow .12s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-align:center;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(1px)}
+    .btn:focus-visible{outline:4px solid rgba(255,209,102,.7);outline-offset:2px}
+    .btn.primary{
+      color:white;background:linear-gradient(135deg,var(--blue),#258EE5);
+      box-shadow:0 8px 20px rgba(57,167,255,.25);
+    }
+    .btn.purple{
+      color:white;background:linear-gradient(135deg,var(--purple),#6248E6);
+    }
+    .btn.yellow{
+      color:#392D00;background:var(--yellow);
+    }
+    .btn.ghost{
+      background:#F3F7FD;color:var(--navy);border:1px solid var(--border);
+    }
+    .btn.danger{
+      background:#FFF0F2;color:#A52837;border:1px solid #F4C6CD;
+    }
+    .btn[disabled]{opacity:.48;cursor:not-allowed;transform:none!important;box-shadow:none}
+    .btn.block{width:100%}
+    .notice{
+      border-radius:15px;
+      padding:12px 14px;
+      margin-top:12px;
+      line-height:1.45;
+      font-weight:700;
+    }
+    .notice.warn{background:#FFF7D8;color:#765A00;border:1px solid #FFE59A}
+    .notice.ok{background:#EAF8F0;color:#17683F;border:1px solid #BDE9D0}
+    .notice.bad{background:#FFF0F2;color:#8E2936;border:1px solid #F4C6CD}
+    .notice.info{background:#EEF6FF;color:#225D94;border:1px solid #CDE3FB}
+    .menu-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .menu-card{
+      background:white;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      min-height:132px;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .menu-card:hover{transform:translateY(-1px)}
+    .menu-card .icon{font-size:34px}
+    .menu-card h3{margin:10px 0 4px;color:var(--navy);font-size:18px}
+    .menu-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#EEF6FF;
+      color:#265F93;
+      font-size:12px;
+      font-weight:800;
+    }
+    .badge.done{background:#EAF8F0;color:#17683F}
+    .bottom-nav{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      min-height:var(--nav-h);
+      background:rgba(255,255,255,.97);
+      border-top:1px solid #D8E6F7;
+      box-shadow:0 -8px 28px rgba(16,32,64,.12);
+      z-index:9999;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+      padding:10px max(10px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+    }
+    .bottom-nav.hidden{display:none}
+    .nav-btn{
+      min-height:54px;
+      border:none;
+      border-radius:14px;
+      font-weight:800;
+      cursor:pointer;
+      background:#EEF5FD;
+      color:var(--navy);
+    }
+    .nav-btn.next{background:var(--blue);color:white}
+    .nav-btn:disabled{opacity:.4;cursor:not-allowed}
+    .section-title{
+      color:white;
+      margin:0 0 14px;
+      font-size:clamp(24px,4vw,36px);
+      font-weight:900;
+    }
+    .section-sub{
+      color:#D7E6FF;
+      margin:-6px 0 16px;
+      line-height:1.5;
+    }
+    .target-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+    .target-card{
+      background:white;
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--border);
+    }
+    .target-card .big{font-size:34px}
+    .target-card h3{margin:8px 0 6px;color:var(--navy)}
+    .formula{
+      font-size:clamp(25px,5vw,42px);
+      font-weight:900;
+      text-align:center;
+      color:var(--purple);
+      background:#F4F1FF;
+      border:1px solid #DFD7FF;
+      border-radius:18px;
+      padding:16px;
+      margin:12px 0;
+    }
+    .stepper{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+    .step{
+      border-left:5px solid var(--blue);
+      background:#F6FAFF;
+      border-radius:14px;
+      padding:12px 14px;
+    }
+    .step b{color:var(--navy)}
+    .circle-diagram{
+      width:min(300px,78vw);
+      aspect-ratio:1;
+      border-radius:50%;
+      margin:14px auto;
+      background:radial-gradient(circle at center,#fff 0 4px,transparent 5px),linear-gradient(145deg,#E8F4FF,#CFE9FF);
+      border:6px solid var(--blue);
+      position:relative;
+      box-shadow:0 8px 24px rgba(57,167,255,.18);
+      overflow:visible;
+    }
+    .center-dot{
+      width:14px;height:14px;border-radius:50%;background:var(--purple);
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    }
+    .radius-line,.diameter-line{
+      position:absolute;left:50%;top:50%;
+      transform-origin:left center;
+      height:4px;background:var(--purple);border-radius:99px;
+    }
+    .radius-line{width:42%;transform:rotate(-25deg)}
+    .diameter-line{width:92%;transform:translateX(-50%) rotate(0deg);left:50%;background:var(--yellow)}
+    .hotspots{
+      display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px
+    }
+    .hotspot-btn{
+      border:1px solid var(--border);
+      background:white;
+      color:var(--navy);
+      border-radius:999px;
+      padding:9px 12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .hotspot-btn.active{background:var(--purple);color:white;border-color:var(--purple)}
+    .diagram-block{
+      width:min(330px,84vw);
+      margin:14px auto;
+    }
+    .circle-visual{
+      width:100%;
+      aspect-ratio:1 / 1;
+      border-radius:0;
+      border:none;
+      background:transparent;
+      box-shadow:none;
+      margin:0 auto;
+      padding:0;
+      overflow:visible;
+    }
+    .circle-svg{width:100%;height:auto;display:block}
+    .circle-svg .base-circle{fill:#E8F4FF;stroke:var(--blue);stroke-width:8}
+    .circle-svg .svg-juring{
+      fill:rgba(255,209,102,.20);
+      stroke:rgba(255,209,102,.55);
+      stroke-width:3;
+      opacity:.22;
+      transition:opacity .2s ease,transform .2s ease;
+      transform-origin:150px 150px;
+    }
+    .circle-svg .svg-busur,
+    .circle-svg .svg-jari,
+    .circle-svg .svg-diameter,
+    .circle-svg .svg-pusat{
+      opacity:.22;
+      transition:opacity .2s ease,transform .2s ease,stroke-width .2s ease,fill .2s ease;
+    }
+    .circle-svg .svg-jari{
+      stroke:var(--purple);
+      stroke-width:8;
+      stroke-linecap:round;
+      fill:none;
+    }
+    .circle-svg .svg-diameter{
+      stroke:var(--yellow);
+      stroke-width:8;
+      stroke-linecap:round;
+      fill:none;
+    }
+    .circle-svg .svg-busur{
+      stroke:#FF8A5B;
+      stroke-width:10;
+      stroke-linecap:round;
+      fill:none;
+    }
+    .circle-svg .svg-pusat{
+      fill:var(--purple);
+      stroke:white;
+      stroke-width:4;
+    }
+    .circle-svg .active{
+      opacity:1 !important;
+      filter:url(#glow);
+    }
+    .circle-svg .svg-juring.active{
+      fill:rgba(255,209,102,.55);
+      stroke:#E5A500;
+      stroke-width:4;
+      transform:scale(1.01);
+    }
+    .circle-svg .svg-jari.active,
+    .circle-svg .svg-diameter.active,
+    .circle-svg .svg-busur.active{
+      stroke-width:11;
+    }
+    .circle-svg .svg-pusat.active{
+      r:11;
+      fill:#7B61FF;
+    }
+    .circle-svg text{
+      font-family:Inter,Poppins,"Segoe UI",Arial,sans-serif;
+      font-weight:800;
+      fill:#173056;
+    }
+    .diagram-caption{
+      text-align:center;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .circle-svg .callout-arrow{
+      stroke:#FF8A5B;
+      stroke-width:4;
+      stroke-linecap:round;
+      stroke-dasharray:8 7;
+      fill:none;
+      animation:dashMove 1s linear infinite;
+    }
+    .circle-svg .callout-dot{
+      fill:#FF8A5B;
+      animation:pulseDot 1.1s ease-in-out infinite;
+    }
+    .circle-svg .callout-bubble{
+      fill:rgba(255,255,255,.96);
+      stroke:#FFBE7C;
+      stroke-width:2.5;
+      rx:16;
+      ry:16;
+      filter:url(#glowSoft);
+    }
+    .circle-svg .callout-title{
+      font-size:14px;
+      font-weight:900;
+      fill:#12365F;
+    }
+    .circle-svg .callout-sub{
+      font-size:11.5px;
+      font-weight:700;
+      fill:#4B6281;
+    }
+    .circle-svg .point-badge{
+      fill:white;
+      stroke:#7B61FF;
+      stroke-width:2.5;
+    }
+    .circle-svg .point-label{
+      font-size:14px;
+      font-weight:900;
+      fill:#21395B;
+      text-anchor:middle;
+      dominant-baseline:middle;
+    }
+    .point-legend{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top:10px;
+    }
+    .point-legend .badge{
+      background:#F6FAFF;
+      border:1px solid var(--border);
+      color:var(--navy);
+    }
+    .match-activity{
+      display:grid;
+      grid-template-columns:minmax(0,1fr);
+      gap:14px;
+    }
+    .match-chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .match-chip{
+      border:2px dashed #BFD6F5;
+      background:#FFFFFF;
+      color:var(--navy);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:800;
+      cursor:grab;
+      user-select:none;
+    }
+    .match-chip.selected{
+      background:#F4F1FF;
+      border-color:var(--purple);
+      color:var(--purple);
+      box-shadow:0 0 0 4px rgba(123,97,255,.10);
+    }
+    .match-chip.done{
+      background:#EAF8F0;
+      border-style:solid;
+      border-color:#BDE9D0;
+      color:#17683F;
+      cursor:default;
+    }
+    .match-board{
+      background:#F8FBFF;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:12px;
+    }
+    .match-board-wrap{
+      position:relative;
+      width:min(330px,84vw);
+      margin:0 auto;
+    }
+    .match-board-wrap .diagram-block{
+      width:100%;
+      margin:0 auto;
+    }
+    .match-target{
+      position:absolute;
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      border:2px dashed #7B61FF;
+      background:rgba(255,255,255,.88);
+      color:#7B61FF;
+      font-weight:900;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      transition:transform .15s ease,background .15s ease,border-color .15s ease;
+    }
+    .match-target:hover{transform:scale(1.03)}
+    .match-target.ready{
+      border-style:solid;
+      background:#F4F1FF;
+    }
+    .match-target.matched{
+      width:auto;
+      min-width:78px;
+      height:38px;
+      border-radius:999px;
+      padding:0 10px;
+      background:#EAF8F0;
+      border:2px solid #BDE9D0;
+      color:#17683F;
+      font-size:12px;
+    }
+    .match-target small{
+      font-size:10px;
+      line-height:1.1;
+      text-align:center;
+      display:block;
+    }
+    .drag-tip{
+      margin-top:6px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    @keyframes dashMove{
+      from{stroke-dashoffset:0}
+      to{stroke-dashoffset:-30}
+    }
+    @keyframes pulseDot{
+      0%,100%{transform:scale(1); opacity:1}
+      50%{transform:scale(1.15); opacity:.82}
+    }
+    .orbit-demo{
+      width:min(320px,80vw);
+      aspect-ratio:1;
+      margin:10px auto;
+      border:5px solid var(--blue);
+      border-radius:50%;
+      position:relative;
+      background:radial-gradient(circle,#E9F5FF 0 58%,#D7ECFF 59% 100%);
+    }
+    .orbit-demo.spin::after{
+      content:"🚀";
+      position:absolute;
+      font-size:30px;
+      left:50%;top:-16px;
+      transform:translateX(-50%);
+      animation:orbitSpin 1.5s linear 1;
+      transform-origin:0 calc(50% + 158px);
+    }
+    @keyframes orbitSpin{
+      from{transform:translateX(-50%) rotate(0deg)}
+      to{transform:translateX(-50%) rotate(360deg)}
+    }
+    .choice-list{display:grid;gap:10px;margin-top:12px}
+    .choice{
+      width:100%;
+      text-align:left;
+      border:2px solid var(--border);
+      background:white;
+      color:var(--text);
+      border-radius:15px;
+      padding:13px 14px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .choice.selected{border-color:var(--purple);background:#F4F1FF}
+    .choice.correct{border-color:var(--ok);background:#EAF8F0}
+    .choice.wrong{border-color:var(--bad);background:#FFF0F2}
+    .hint-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .slider-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;align-items:center;margin:12px 0
+    }
+    input[type="range"]{width:100%}
+    .stat-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .stat{
+      background:#F6FAFF;
+      border:1px solid var(--border);
+      border-radius:15px;
+      padding:12px;
+    }
+    .stat small{display:block;color:var(--muted)}
+    .stat strong{display:block;color:var(--navy);font-size:22px;margin-top:4px}
+    .quiz-head{
+      display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px
+    }
+    .quiz-progress{
+      flex:1;height:10px;background:#E8EEF7;border-radius:99px;overflow:hidden
+    }
+    .quiz-progress > div{
+      height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));width:0%
+    }
+    .match-grid{
+      display:grid;gap:10px
+    }
+    .match-row{
+      display:grid;grid-template-columns:1.2fr 1fr;gap:10px;align-items:center
+    }
+    .order-list{display:grid;gap:8px}
+    .order-row{
+      display:grid;grid-template-columns:46px 1fr;gap:8px;align-items:center
+    }
+    .order-row select{min-height:46px;padding:8px}
+    .result-score{
+      font-size:clamp(54px,12vw,92px);
+      font-weight:900;color:var(--purple);
+      text-align:center;line-height:1
+    }
+    .result-cat{
+      text-align:center;
+      font-weight:900;
+      font-size:clamp(20px,4vw,30px);
+      color:var(--navy);
+      margin:8px 0 16px;
+    }
+    .fuel{
+      height:26px;border-radius:99px;background:#E8EEF7;overflow:hidden;border:1px solid #D9E5F4
+    }
+    .fuel > div{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#FFD166,#FFB84D);
+      transition:width .25s ease;
+    }
+    .sector-wrap{
+      display:grid;place-items:center;margin:14px 0;
+    }
+    .sector{
+      width:220px;height:220px;border-radius:50%;
+      background:conic-gradient(var(--yellow) 0deg 90deg,#DDEBFA 90deg 360deg);
+      border:5px solid var(--blue);
+      position:relative;
+    }
+    .sector::after{
+      content:"";
+      position:absolute;inset:28%;
+      border-radius:50%;
+      background:white;
+      opacity:.18;
+    }
+    .tiny{font-size:12px;color:var(--muted)}
+    .footer-note{
+      color:#D1DFF7;text-align:center;font-size:12px;padding:8px 0 4px
+    }
+    .inline-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .inline-actions .btn{flex:1 1 180px}
+    .review-item{
+      background:#F8FBFF;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      margin:10px 0;
+    }
+    .hidden{display:none!important}
+    @media (max-width:720px){
+      :root{--header-h:74px;--nav-h:76px}
+      .menu-grid,.target-grid{grid-template-columns:1fr}
+      .match-row{grid-template-columns:1fr}
+      .header-progress{display:none}
+      .content-scroll{padding-left:12px;padding-right:12px}
+      .card{padding:15px}
+    }
+    @media (min-width:721px){
+      .menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media (min-width:1200px){
+      .content-scroll{padding-top:28px}
+      .menu-card{min-height:150px}
+      .btn,.nav-btn{font-size:18px}
+      .card{padding:24px}
+    }
+
+    /* ===== POLISH GALAXY UI ===== */
+    body{
+      background:
+        radial-gradient(circle at 20% 15%, rgba(123,97,255,.22), transparent 28%),
+        radial-gradient(circle at 85% 10%, rgba(57,167,255,.18), transparent 24%),
+        radial-gradient(circle at 55% 85%, rgba(255,209,102,.08), transparent 20%),
+        linear-gradient(160deg,#081226 0%,#101A3A 46%,#171B43 100%);
+    }
+
+    .app{
+      isolation:isolate;
+    }
+
+    .galaxy-bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .galaxy-nebula{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(42px);
+      opacity:.42;
+      mix-blend-mode:screen;
+    }
+    .nebula-a{
+      width:420px;height:420px;
+      left:-170px;top:5%;
+      background:radial-gradient(circle,rgba(123,97,255,.72),rgba(123,97,255,0) 70%);
+    }
+    .nebula-b{
+      width:520px;height:520px;
+      right:-220px;top:26%;
+      background:radial-gradient(circle,rgba(57,167,255,.46),rgba(57,167,255,0) 72%);
+    }
+    .nebula-c{
+      width:430px;height:430px;
+      left:30%;bottom:-260px;
+      background:radial-gradient(circle,rgba(255,209,102,.18),rgba(255,209,102,0) 70%);
+    }
+
+    .galaxy-stars,
+    .galaxy-stars::before,
+    .galaxy-stars::after{
+      position:absolute;
+      inset:0;
+      content:"";
+      background-repeat:repeat;
+    }
+    .galaxy-stars{
+      opacity:.78;
+      background-image:
+        radial-gradient(circle,#fff 0 1px,transparent 1.5px),
+        radial-gradient(circle,#9FD6FF 0 1px,transparent 1.5px);
+      background-size:90px 90px,150px 150px;
+      background-position:0 0,32px 55px;
+    }
+    .galaxy-stars::before{
+      opacity:.38;
+      background-image:
+        radial-gradient(circle,#fff 0 1px,transparent 1.5px),
+        radial-gradient(circle,#D7C9FF 0 1px,transparent 1.4px);
+      background-size:210px 210px,260px 260px;
+      background-position:40px 20px,120px 80px;
+    }
+    .galaxy-stars::after{
+      opacity:.25;
+      background-image:radial-gradient(circle,#fff 0 1px,transparent 1.2px);
+      background-size:55px 55px;
+      background-position:18px 28px;
+    }
+
+    .decor-planet{
+      position:absolute;
+      border-radius:50%;
+      box-shadow:
+        inset -12px -18px 28px rgba(0,0,0,.22),
+        0 0 34px rgba(123,97,255,.15);
+      opacity:.88;
+    }
+    .decor-planet::after{
+      content:"";
+      position:absolute;
+      left:50%;top:50%;
+      width:135%;height:28%;
+      border:3px solid rgba(255,255,255,.35);
+      border-radius:50%;
+      transform:translate(-50%,-50%) rotate(-18deg);
+    }
+    .planet-one{
+      width:110px;height:110px;
+      right:6%;top:11%;
+      background:
+        radial-gradient(circle at 33% 30%,rgba(255,255,255,.35) 0 8%,transparent 9%),
+        linear-gradient(145deg,#7B61FF,#3E54D9);
+      animation:planetFloat 7s ease-in-out infinite;
+    }
+    .planet-two{
+      width:72px;height:72px;
+      left:5%;bottom:18%;
+      background:
+        radial-gradient(circle at 64% 34%,rgba(255,255,255,.28) 0 7%,transparent 8%),
+        linear-gradient(145deg,#37C5FF,#167FCA);
+      animation:planetFloat 9s ease-in-out infinite reverse;
+    }
+    .planet-three{
+      width:44px;height:44px;
+      left:18%;top:18%;
+      background:linear-gradient(145deg,#FFD166,#F69B45);
+      opacity:.72;
+      animation:planetFloat 8s ease-in-out infinite 1s;
+    }
+    @keyframes planetFloat{
+      0%,100%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-12px) rotate(3deg)}
+    }
+
+    .shooting-star{
+      position:absolute;
+      width:150px;height:2px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+      transform:rotate(-25deg);
+      opacity:.18;
+    }
+    .shooting-star.one{right:12%;top:32%}
+    .shooting-star.two{left:10%;top:62%;transform:rotate(18deg);opacity:.10}
+
+    .app-header{
+      background:linear-gradient(180deg,rgba(9,19,45,.88),rgba(14,22,48,.78));
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(178,210,255,.16);
+      box-shadow:0 8px 30px rgba(2,8,26,.20);
+    }
+    .header-icon{
+      background:
+        radial-gradient(circle at 35% 30%,rgba(255,255,255,.34) 0 8%,transparent 9%),
+        linear-gradient(145deg,var(--purple),var(--blue));
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .content-wrap{
+      z-index:2;
+    }
+
+    .page{
+      position:relative;
+    }
+
+    .section-title{
+      letter-spacing:-.02em;
+      text-shadow:0 4px 22px rgba(0,0,0,.18);
+    }
+    .section-sub{
+      color:#C9DCF7;
+    }
+
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(247,250,255,.95));
+      border:1px solid rgba(198,220,248,.78);
+      box-shadow:
+        0 16px 44px rgba(4,17,44,.20),
+        inset 0 1px 0 rgba(255,255,255,.9);
+    }
+
+    .hero{
+      position:relative;
+      padding-top:8px;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      width:230px;height:230px;
+      left:50%;top:4px;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(83,163,255,.22),transparent 68%);
+      filter:blur(8px);
+      z-index:-1;
+    }
+    .hero h1{
+      background:linear-gradient(90deg,#FFFFFF,#DCEBFF 48%,#FFF0B6);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:none;
+      letter-spacing:-.035em;
+    }
+
+    .planet-logo{
+      width:128px;height:128px;
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow:
+        0 0 0 14px rgba(123,97,255,.08),
+        0 0 54px rgba(57,167,255,.28),
+        inset -18px -20px 34px rgba(22,33,62,.18);
+      animation:logoFloat 5s ease-in-out infinite;
+    }
+    @keyframes logoFloat{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-7px)}
+    }
+
+    .menu-grid{
+      gap:14px;
+    }
+    .menu-card{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,247,255,.95));
+      border:1px solid rgba(198,220,248,.9);
+      border-radius:24px;
+      min-height:148px;
+      box-shadow:
+        0 14px 34px rgba(4,18,46,.16),
+        inset 0 1px 0 rgba(255,255,255,.92);
+      overflow:hidden;
+      isolation:isolate;
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+    }
+    .menu-card::before{
+      content:"";
+      position:absolute;
+      width:94px;height:94px;
+      border-radius:50%;
+      right:-26px;top:-26px;
+      background:radial-gradient(circle,rgba(123,97,255,.18),rgba(123,97,255,0) 70%);
+      z-index:-1;
+    }
+    .menu-card::after{
+      content:"";
+      position:absolute;
+      width:80px;height:20px;
+      border:2px solid rgba(123,97,255,.10);
+      border-radius:50%;
+      right:-22px;top:30px;
+      transform:rotate(-18deg);
+      z-index:-1;
+    }
+    .menu-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(123,97,255,.34);
+      box-shadow:0 18px 42px rgba(4,18,46,.22);
+    }
+    .menu-card .icon{
+      width:46px;height:46px;
+      display:grid;place-items:center;
+      border-radius:16px;
+      background:linear-gradient(145deg,#F4F1FF,#E8F5FF);
+      font-size:26px;
+      box-shadow:inset 0 0 0 1px rgba(123,97,255,.08);
+    }
+
+    .badge{
+      border:1px solid rgba(57,167,255,.12);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .bottom-nav{
+      left:50%;
+      right:auto;
+      transform:translateX(-50%);
+      width:min(760px,calc(100% - 20px));
+      bottom:10px;
+      min-height:70px;
+      border:1px solid rgba(206,224,246,.86);
+      border-radius:24px;
+      background:rgba(250,253,255,.91);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      box-shadow:0 16px 44px rgba(4,17,44,.22);
+      padding:8px;
+    }
+    .nav-btn{
+      min-height:52px;
+      border-radius:17px;
+      background:linear-gradient(180deg,#F3F8FE,#EAF2FC);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    .nav-btn.next{
+      background:linear-gradient(135deg,#39A7FF,#7B61FF);
+      box-shadow:0 8px 18px rgba(79,111,255,.24);
+    }
+
+    .btn{
+      border-radius:17px;
+      min-height:54px;
+    }
+    .btn.primary{
+      background:linear-gradient(135deg,#39A7FF,#7B61FF);
+      box-shadow:0 10px 26px rgba(79,111,255,.24);
+    }
+    .btn.purple{
+      background:linear-gradient(135deg,#7B61FF,#5541CC);
+      box-shadow:0 10px 26px rgba(123,97,255,.22);
+    }
+    .btn.yellow{
+      background:linear-gradient(135deg,#FFD166,#FFB84D);
+      box-shadow:0 9px 22px rgba(255,184,77,.20);
+    }
+
+    .formula{
+      border:1px solid rgba(123,97,255,.18);
+      background:
+        radial-gradient(circle at 80% 20%,rgba(57,167,255,.12),transparent 28%),
+        linear-gradient(135deg,#F7F3FF,#EEF7FF);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    .target-card{
+      border-radius:24px;
+      background:linear-gradient(145deg,#FFFFFF,#F4F8FF);
+      transition:transform .16s ease,box-shadow .16s ease;
+    }
+    .target-card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 16px 36px rgba(4,18,46,.17);
+    }
+
+    .choice{
+      transition:transform .13s ease,border-color .13s ease,background .13s ease;
+    }
+    .choice:hover{
+      transform:translateY(-1px);
+      border-color:#A8CCF4;
+      background:#F9FCFF;
+    }
+
+    .notice{
+      border-radius:17px;
+    }
+
+    .circle-diagram,
+    .orbit-demo,
+    .sector{
+      box-shadow:
+        0 14px 30px rgba(12,38,84,.14),
+        inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    .planet-selector-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .planet-selector{
+      position:relative;
+      overflow:hidden;
+      border-radius:24px;
+      border:1px solid rgba(198,220,248,.85);
+      background:linear-gradient(160deg,rgba(255,255,255,.98),rgba(241,247,255,.96));
+      box-shadow:0 14px 34px rgba(4,18,46,.16);
+      padding:16px;
+      text-align:left;
+    }
+    .planet-selector.locked{
+      opacity:.7;
+      background:linear-gradient(160deg,rgba(245,247,252,.98),rgba(235,241,248,.95));
+    }
+    .planet-selector::before{
+      content:"";
+      position:absolute;
+      width:130px;height:130px;border-radius:50%;
+      right:-46px;top:-48px;
+      background:radial-gradient(circle,rgba(123,97,255,.16),rgba(123,97,255,0) 70%);
+      pointer-events:none;
+    }
+    .planet-visual{
+      width:72px;height:72px;border-radius:50%;
+      display:grid;place-items:center;
+      font-size:34px;
+      position:relative;
+      box-shadow:
+        inset -10px -12px 14px rgba(0,0,0,.12),
+        0 10px 20px rgba(20,32,66,.12);
+      border:1px solid rgba(255,255,255,.8);
+      margin-bottom:12px;
+    }
+    .planet-visual::after{
+      content:"";
+      position:absolute;
+      width:110%;height:24%;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.42);
+      left:50%;top:50%;
+      transform:translate(-50%,-50%) rotate(-18deg);
+    }
+    .planet-visual.p1{background:linear-gradient(145deg,#6CCBFF,#2F90E8)}
+    .planet-visual.p2{background:linear-gradient(145deg,#927BFF,#654CE2)}
+    .planet-visual.p3{background:linear-gradient(145deg,#FFD166,#F5A948)}
+    .planet-visual.p4{background:linear-gradient(145deg,#6DE1D2,#3AB9AA)}
+    .planet-visual.p5{background:linear-gradient(145deg,#FF88B7,#E55A94)}
+    .planet-selector h4{
+      margin:0 0 4px;
+      font-size:18px;
+      color:var(--navy);
+    }
+    .planet-selector .planet-code{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.04em;
+      color:var(--purple);
+      text-transform:uppercase;
+    }
+    .planet-selector .planet-topic{
+      font-size:14px;
+      font-weight:800;
+      color:#225D94;
+      margin:4px 0 8px;
+    }
+    .planet-selector .planet-desc{
+      font-size:13px;
+      line-height:1.45;
+      color:var(--muted);
+      min-height:38px;
+    }
+    .planet-selector .planet-footer{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .planet-enter{
+      min-height:42px;
+      border:none;
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      background:linear-gradient(135deg,#39A7FF,#7B61FF);
+      color:white;
+      box-shadow:0 8px 18px rgba(79,111,255,.22);
+    }
+    .planet-enter[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+    .planet-status{
+      font-size:12px;
+      font-weight:800;
+    }
+    .planet-status.done{color:#17683F}
+    .planet-status.open{color:#225D94}
+    .planet-status.locked{color:#8E2936}
+    .planet-path{
+      display:grid;
+      gap:12px;
+    }
+    .planet-stop{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:12px;
+      padding:13px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:linear-gradient(145deg,#FFFFFF,#F4F8FF);
+      position:relative;
+      overflow:hidden;
+    }
+    .planet-stop::after{
+      content:"";
+      position:absolute;
+      width:80px;height:80px;
+      border-radius:50%;
+      right:-28px;top:-28px;
+      background:radial-gradient(circle,rgba(57,167,255,.14),transparent 68%);
+    }
+    .planet-dot{
+      width:48px;height:48px;
+      border-radius:50%;
+      display:grid;place-items:center;
+      font-size:24px;
+      box-shadow:inset -6px -8px 12px rgba(0,0,0,.10);
+      border:1px solid rgba(255,255,255,.65);
+    }
+    .p1{background:linear-gradient(145deg,#6CCBFF,#2F90E8)}
+    .p2{background:linear-gradient(145deg,#927BFF,#654CE2)}
+    .p3{background:linear-gradient(145deg,#FFD166,#F5A948)}
+    .p4{background:linear-gradient(145deg,#6DE1D2,#3AB9AA)}
+    .p5{background:linear-gradient(145deg,#FF88B7,#E55A94)}
+
+    .cosmic-divider{
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(123,97,255,.34),transparent);
+      margin:12px 0;
+    }
+
+    @media (max-width:720px){
+      .decor-planet.planet-one{width:82px;height:82px;right:-16px;top:12%}
+      .decor-planet.planet-two{width:56px;height:56px;left:-10px;bottom:22%}
+      .decor-planet.planet-three{display:none}
+      .bottom-nav{
+        bottom:8px;
+        width:calc(100% - 14px);
+        border-radius:20px;
+      }
+      .content-scroll{
+        padding-bottom:calc(var(--nav-h) + 38px);
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .decor-planet,.planet-logo{animation:none!important}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    }
+  </style>
+</head>
+<body>
+<div class="galaxy-bg" aria-hidden="true">
+  <div class="galaxy-stars"></div>
+  <div class="galaxy-nebula nebula-a"></div>
+  <div class="galaxy-nebula nebula-b"></div>
+  <div class="galaxy-nebula nebula-c"></div>
+  <div class="decor-planet planet-one"></div>
+  <div class="decor-planet planet-two"></div>
+  <div class="decor-planet planet-three"></div>
+  <div class="shooting-star one"></div>
+  <div class="shooting-star two"></div>
+</div>
+<div id="app" class="app">
+  <header id="appHeader" class="app-header hidden">
+    <div class="header-icon">🪐</div>
+    <div class="header-main">
+      <div id="headerTitle" class="header-title">Ekspedisi Planet Lingkaran</div>
+      <div class="header-meta">
+        <span id="headerUser">Penjelajah: -</span>
+        <span id="headerStep">Misi 0/5</span><span id="headerCloud">☁️ Menyambungkan…</span>
+      </div>
+    </div>
+    <div class="header-progress">
+      <div class="progress-track"><div id="headerProgressFill" class="progress-fill"></div></div>
+    </div>
+  </header>
+
+  <div class="content-wrap">
+    <main id="content" class="content-scroll no-nav" tabindex="-1"></main>
+  </div>
+
+  <nav id="bottomNav" class="bottom-nav hidden" aria-label="Navigasi utama">
+    <button id="btnMenu" class="nav-btn" aria-label="Menu utama">🏠 MENU</button>
+    <button id="btnBack" class="nav-btn" aria-label="Kembali">← KEMBALI</button>
+    <button id="btnNext" class="nav-btn next" aria-label="Lanjut">LANJUT →</button>
+  </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  // ===============================
+  // STATE & LOCAL STORAGE
+  // ===============================
+  const STORAGE_KEY = "mpi_lingkaran_v1";
+
+  const defaultState = {
+    namaSiswa: "",
+    kelasSiswa: "",
+    identitasValid: false,
+    screen: "pembuka",
+    sub: 0,
+    materiSelesai: {
+      keliling:false,
+      luas:false,
+      busur:false,
+      sudut:false,
+      juring:false
+    },
+    visited: {},
+    quizAnswers: {},
+    quizIndex: 0,
+    evaluasiSelesai: false,
+    nilaiAkhir: 0,
+    kategoriHasil: "",
+    evaluationAttemptId: "",
+    evaluationSyncedAt: null,
+    lastSavedAt: null
+  };
+
+  let state = loadState();
+  let transient = {
+    introConfirmed:false,
+    materialHotspot:null,
+    materialMatchSelected:null,
+    materialMatched:{},
+    materialMatchFeedback:"",
+    lessonStepCount:0,
+    practiceFeedback:"",
+    practiceAnswered:false,
+    hintLevel:0,
+    simRadius:8,
+    simAngle:90,
+    sectorAngle:90,
+    fuel:0,
+    fuelIndex:0
+  };
+
+  // ===============================
+  // SUPABASE CLOUD SYNC
+  // ===============================
+  let sbClient = null;
+  let cloudUser = null;
+  let cloudReady = false;
+  let cloudSyncTimer = null;
+  let cloudStatus = "connecting";
+
+  function setCloudStatus(status, text){
+    cloudStatus = status;
+    const el = document.getElementById("headerCloud");
+    if(!el) return;
+    const labels = {
+      connecting: "☁️ Menyambungkan…",
+      online: "☁️ Tersinkron",
+      syncing: "☁️ Menyimpan…",
+      offline: "☁️ Offline — cache lokal",
+      config: "☁️ Supabase belum dikonfigurasi",
+      error: "☁️ Sinkronisasi bermasalah"
+    };
+    el.textContent = text || labels[status] || labels.connecting;
+  }
+
+  function isSupabaseConfigured(){
+    const cfg = window.SUPABASE_CONFIG || {};
+    return !!(
+      cfg.url &&
+      cfg.key &&
+      !String(cfg.url).includes("YOUR_PROJECT") &&
+      !String(cfg.key).includes("YOUR_")
+    );
+  }
+
+  function newUuid(){
+    if(globalThis.crypto && typeof globalThis.crypto.randomUUID === "function"){
+      return globalThis.crypto.randomUUID();
+    }
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === "x" ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  function saveStateLocalOnly(){
+    state.lastSavedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function scheduleCloudSync(){
+    if(!cloudReady || !state.identitasValid || !navigator.onLine) return;
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(() => {
+      pushCloudState().catch(err => {
+        console.error("Cloud sync error:", err);
+        setCloudStatus("error");
+      });
+    }, 700);
+  }
+
+  async function ensureAnonymousSession(){
+    const { data: sessionData, error: sessionError } = await sbClient.auth.getSession();
+    if(sessionError) throw sessionError;
+
+    let session = sessionData.session;
+    if(!session){
+      const { data, error } = await sbClient.auth.signInAnonymously();
+      if(error) throw error;
+      session = data.session;
+    }
+
+    const { data: userData, error: userError } = await sbClient.auth.getUser();
+    if(userError) throw userError;
+    cloudUser = userData.user;
+    return session;
+  }
+
+  async function pullCloudState(){
+    if(!cloudReady || !cloudUser) return;
+
+    const { data, error } = await sbClient
+      .from("student_state")
+      .select("app_state, updated_at")
+      .eq("user_id", cloudUser.id)
+      .maybeSingle();
+
+    if(error) throw error;
+
+    if(!data){
+      if(state.identitasValid) await pushCloudState(true);
+      return;
+    }
+
+    const remoteTime = Date.parse(data.updated_at || "") || 0;
+    const localTime = Date.parse(state.lastSavedAt || "") || 0;
+
+    if(remoteTime > localTime && data.app_state){
+      state = {
+        ...defaultState,
+        ...data.app_state,
+        materiSelesai:{
+          ...defaultState.materiSelesai,
+          ...(data.app_state.materiSelesai || {})
+        }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      render();
+    } else if(localTime > remoteTime && state.identitasValid){
+      await pushCloudState(true);
+    }
+  }
+
+  async function pushCloudState(immediate=false){
+    if(!cloudReady || !cloudUser || !state.identitasValid || !navigator.onLine) return;
+    if(!immediate) setCloudStatus("syncing");
+
+    const payload = {
+      user_id: cloudUser.id,
+      student_name: state.namaSiswa,
+      class_name: state.kelasSiswa,
+      app_state: state
+    };
+
+    const { error } = await sbClient
+      .from("student_state")
+      .upsert(payload, { onConflict:"user_id" });
+
+    if(error) throw error;
+    setCloudStatus("online");
+
+    if(state.evaluasiSelesai){
+      await syncEvaluationResult();
+    }
+  }
+
+  async function syncEvaluationResult(){
+    if(!cloudReady || !cloudUser || !state.evaluasiSelesai || !navigator.onLine) return;
+
+    if(!state.evaluationAttemptId){
+      state.evaluationAttemptId = newUuid();
+      saveStateLocalOnly();
+    }
+
+    const payload = {
+      attempt_id: state.evaluationAttemptId,
+      user_id: cloudUser.id,
+      student_name: state.namaSiswa,
+      class_name: state.kelasSiswa,
+      score: state.nilaiAkhir,
+      category: state.kategoriHasil,
+      answers: state.quizAnswers || {}
+    };
+
+    const { error } = await sbClient
+      .from("evaluation_results")
+      .upsert(payload, { onConflict:"attempt_id" });
+
+    if(error) throw error;
+
+    state.evaluationSyncedAt = new Date().toISOString();
+    saveStateLocalOnly();
+    setCloudStatus("online");
+  }
+
+  async function startFreshCloudIdentity(){
+    if(!sbClient) return;
+    try{
+      await sbClient.auth.signOut();
+      cloudUser = null;
+      cloudReady = false;
+      setCloudStatus("connecting");
+      await ensureAnonymousSession();
+      cloudReady = true;
+      setCloudStatus("online");
+    }catch(err){
+      console.error(err);
+      setCloudStatus("error");
+    }
+  }
+
+  async function initSupabase(){
+    if(!isSupabaseConfigured()){
+      setCloudStatus("config");
+      return;
+    }
+
+    try{
+      const cfg = window.SUPABASE_CONFIG;
+      sbClient = window.supabase.createClient(cfg.url, cfg.key, {
+        auth:{
+          persistSession:true,
+          autoRefreshToken:true,
+          detectSessionInUrl:true
+        }
+      });
+
+      setCloudStatus("connecting");
+      await ensureAnonymousSession();
+      cloudReady = true;
+      setCloudStatus(navigator.onLine ? "online" : "offline");
+
+      if(navigator.onLine){
+        await pullCloudState();
+        if(state.evaluasiSelesai) await syncEvaluationResult();
+      }
+    }catch(err){
+      console.error("Supabase init error:", err);
+      setCloudStatus("error");
+    }
+  }
+
+  window.addEventListener("online", async () => {
+    setCloudStatus("syncing");
+    try{
+      if(!cloudReady) await initSupabase();
+      await pushCloudState(true);
+      if(state.evaluasiSelesai) await syncEvaluationResult();
+      setCloudStatus("online");
+    }catch(err){
+      console.error(err);
+      setCloudStatus("error");
+    }
+  });
+
+  window.addEventListener("offline", () => setCloudStatus("offline"));
+
+  function loadState(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return saved ? {...defaultState, ...saved, materiSelesai:{...defaultState.materiSelesai, ...(saved.materiSelesai||{})}} : {...defaultState};
+    }catch(e){
+      return {...defaultState};
+    }
+  }
+
+  function saveState(){
+    state.lastSavedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    scheduleCloudSync();
+  }
+
+  function markVisited(key){
+    state.visited[key] = true;
+    saveState();
+  }
+
+  function progressCount(){
+    return Object.values(state.materiSelesai).filter(Boolean).length;
+  }
+
+  const planetMeta = [
+    {key:"keliling", code:"Planet 1", name:"Aurelis", topic:"Keliling Lingkaran", emoji:"🪐", accent:"p1", desc:"Planet cincin biru untuk memahami panjang seluruh tepi lingkaran."},
+    {key:"luas", code:"Planet 2", name:"Lumora", topic:"Luas Lingkaran", emoji:"🌕", accent:"p2", desc:"Planet bercahaya ungu untuk menghitung luas daerah di dalam lingkaran."},
+    {key:"busur", code:"Planet 3", name:"Arcadia", topic:"Panjang Busur", emoji:"☄️", accent:"p3", desc:"Planet busur emas untuk mempelajari sebagian keliling lingkaran."},
+    {key:"sudut", code:"Planet 4", name:"Zenthara", topic:"Sudut Lingkaran", emoji:"🛰️", accent:"p4", desc:"Planet satelit hijau untuk menghubungkan sudut pusat dan sudut keliling."},
+    {key:"juring", code:"Planet 5", name:"Sectora", topic:"Luas Juring", emoji:"🌙", accent:"p5", desc:"Planet merah muda untuk menguasai luas sebagian daerah lingkaran."}
+  ];
+
+  function getPlanetStartIndex(key){
+    return learningPages.findIndex(p => p.key === key);
+  }
+
+  function getPlanetLastIndex(key){
+    const indexes = learningPages.map((p,i)=>p.key===key ? i : -1).filter(i=>i!==-1);
+    return indexes.length ? indexes[indexes.length-1] : -1;
+  }
+
+  function isPlanetUnlocked(key){
+    const idx = planetMeta.findIndex(p => p.key === key);
+    if(idx <= 0) return true;
+    return !!state.materiSelesai[planetMeta[idx-1].key];
+  }
+
+  function getNextPlanetKey(){
+    const next = planetMeta.find(p => isPlanetUnlocked(p.key) && !state.materiSelesai[p.key]);
+    return next ? next.key : planetMeta[planetMeta.length-1].key;
+  }
+
+  function getPlanetDisplayName(key){
+    const meta = planetMeta.find(p => p.key === key);
+    return meta ? `${meta.code} — ${meta.name}` : key;
+  }
+
+  // ===============================
+  // DATA MATERI
+  // ===============================
+  const learningPages = [
+    // Planet 1 - Keliling
+    {planet:"Planet 1", key:"keliling", title:"Amati Keliling", type:"keliling-amati"},
+    {planet:"Planet 1", key:"keliling", title:"Rumus Keliling", type:"keliling-rumus"},
+    {planet:"Planet 1", key:"keliling", title:"Contoh Terbimbing", type:"keliling-contoh"},
+    {planet:"Planet 1", key:"keliling", title:"Coba Sendiri", type:"keliling-latihan"},
+    // Planet 2 - Luas
+    {planet:"Planet 2", key:"luas", title:"Amati Luas", type:"luas-amati"},
+    {planet:"Planet 2", key:"luas", title:"Rumus Luas", type:"luas-rumus"},
+    {planet:"Planet 2", key:"luas", title:"Contoh Terbimbing", type:"luas-contoh"},
+    {planet:"Planet 2", key:"luas", title:"Coba Sendiri", type:"luas-latihan"},
+    // Planet 3 - Busur
+    {planet:"Planet 3", key:"busur", title:"Mengenal Busur", type:"busur-kenal"},
+    {planet:"Planet 3", key:"busur", title:"Sudut dan Busur", type:"busur-hubungan"},
+    {planet:"Planet 3", key:"busur", title:"Rumus Panjang Busur", type:"busur-rumus"},
+    {planet:"Planet 3", key:"busur", title:"Contoh Bertahap", type:"busur-contoh"},
+    {planet:"Planet 3", key:"busur", title:"Coba Sendiri", type:"busur-latihan"},
+    // Planet 4 - Sudut
+    {planet:"Planet 4", key:"sudut", title:"Sudut Pusat", type:"sudut-pusat"},
+    {planet:"Planet 4", key:"sudut", title:"Sudut Keliling", type:"sudut-keliling"},
+    {planet:"Planet 4", key:"sudut", title:"Hubungan Sudut", type:"sudut-hubungan"},
+    {planet:"Planet 4", key:"sudut", title:"Contoh", type:"sudut-contoh"},
+    {planet:"Planet 4", key:"sudut", title:"Menghadap Diameter", type:"sudut-diameter"},
+    {planet:"Planet 4", key:"sudut", title:"Simulasi Titik", type:"sudut-simulasi"},
+    // Planet 5 - Juring
+    {planet:"Planet 5", key:"juring", title:"Mengenal Juring", type:"juring-kenal"},
+    {planet:"Planet 5", key:"juring", title:"Pecahan Lingkaran", type:"juring-pecahan"},
+    {planet:"Planet 5", key:"juring", title:"Rumus Luas Juring", type:"juring-rumus"},
+    {planet:"Planet 5", key:"juring", title:"Contoh Bertahap", type:"juring-contoh"},
+    {planet:"Planet 5", key:"juring", title:"Coba Sendiri", type:"juring-latihan"},
+  ];
+
+  const materialPages = [
+    "Kenalan dengan Lingkaran",
+    "Jari-jari dan Diameter",
+    "Mengenal π",
+    "Peta Lima Planet"
+  ];
+
+  const quiz = [
+    {
+      id:"q1", type:"mc", title:"Keliling",
+      q:"Sebuah lingkaran memiliki jari-jari 7 cm. Gunakan π = 22/7. Berapakah keliling lingkaran?",
+      options:["22,00 cm","44,00 cm","49,00 cm","154,00 cm"],
+      answer:1,
+      correct:"Keliling dihitung dengan K = 2 × π × r = 2 × 22/7 × 7 = 44,00 cm.",
+      wrong:"Karena yang diketahui jari-jari, gunakan K = 2 × π × r."
+    },
+    {
+      id:"q2", type:"tf", title:"Luas",
+      q:"Lingkaran berdiameter 10 cm memiliki luas 314,00 cm² jika π = 3,14.",
+      options:["Benar","Salah"], answer:1,
+      correct:"Tepat. Diameter 10 cm berarti jari-jari 5 cm, sehingga luasnya 78,50 cm².",
+      wrong:"Rumus luas memakai jari-jari. Ubah diameter 10 cm menjadi jari-jari 5 cm terlebih dahulu."
+    },
+    {
+      id:"q3", type:"match", title:"Menjodohkan Rumus",
+      q:"Pasangkan setiap konsep dengan rumus yang tepat.",
+      rows:[
+        ["Keliling","2πr"],
+        ["Luas lingkaran","πr²"],
+        ["Panjang busur","θ/360° × 2πr"],
+        ["Luas juring","θ/360° × πr²"]
+      ],
+      choices:["2πr","πr²","θ/360° × 2πr","θ/360° × πr²"],
+      correct:"Busur adalah bagian dari keliling, sedangkan juring adalah bagian dari luas.",
+      wrong:"Perhatikan apakah yang dicari seluruh tepi, seluruh daerah, sebagian tepi, atau sebagian daerah."
+    },
+    {
+      id:"q4", type:"order", title:"Mengurutkan",
+      q:"Urutkan langkah menghitung luas juring untuk r = 14 cm, θ = 90°, dan π = 22/7.",
+      items:[
+        "LJ = θ/360° × πr²",
+        "LJ = 90/360 × 616",
+        "LJ = 1/4 × 616",
+        "LJ = 154,00 cm²"
+      ],
+      correct:"Urutannya adalah rumus umum → substitusi → sederhanakan → hasil.",
+      wrong:"Mulailah dari rumus umum, masukkan angka, sederhanakan pecahan, lalu hitung."
+    },
+    {
+      id:"q5", type:"num", title:"Panjang Busur",
+      q:"Sebuah lingkaran memiliki jari-jari 21 cm dan sudut pusat 60°. Gunakan π = 22/7. Hitung panjang busurnya.",
+      unit:"cm", answer:22,
+      correct:"60° adalah 1/6 dari 360°. Panjang busurnya 1/6 × 132 = 22,00 cm.",
+      wrong:"Coba hitung keliling penuh, lalu kalikan dengan 60/360."
+    },
+    {
+      id:"q6", type:"mc", title:"Sudut Lingkaran",
+      q:"Sudut pusat AOB = 120°. Sudut keliling ACB menghadap busur AB yang sama. Berapakah ∠ACB?",
+      options:["30°","60°","120°","240°"], answer:1,
+      correct:"Sudut keliling = 1/2 × sudut pusat = 60°.",
+      wrong:"Jika menghadap busur yang sama, sudut pusat dua kali sudut keliling."
+    },
+    {
+      id:"q7", type:"num", title:"Luas Lingkaran",
+      q:"Sebuah lingkaran memiliki jari-jari 12 cm. Gunakan π = 3,14. Berapakah luasnya?",
+      unit:"cm²", answer:452.16,
+      correct:"L = 3,14 × 12² = 3,14 × 144 = 452,16 cm².",
+      wrong:"Perhatikan r². Untuk r = 12, r² = 12 × 12 = 144."
+    },
+    {
+      id:"q8", type:"match", title:"Menjodohkan Konteks",
+      q:"Pasangkan situasi dengan konsep yang tepat.",
+      rows:[
+        ["Panjang pagar mengelilingi taman bundar","Keliling"],
+        ["Permukaan meja bundar","Luas lingkaran"],
+        ["Bagian lintasan yang melengkung","Panjang busur"],
+        ["Bagian taman berbentuk sektor","Luas juring"]
+      ],
+      choices:["Keliling","Luas lingkaran","Panjang busur","Luas juring"],
+      correct:"Tepi penuh = keliling, daerah penuh = luas, sebagian tepi = busur, sebagian daerah = juring.",
+      wrong:"Bedakan kata kunci: tepi, permukaan, sebagian tepi, dan bagian berbentuk sektor."
+    },
+    {
+      id:"q9", type:"tf", title:"Sudut Menghadap Diameter",
+      q:"Jika sudut keliling ACB menghadap diameter AB, maka ∠ACB = 90°.",
+      options:["Benar","Salah"], answer:0,
+      correct:"Benar. Sudut keliling yang menghadap diameter selalu 90°.",
+      wrong:"Diameter membentuk busur 180°. Sudut kelilingnya adalah setengah 180°, yaitu 90°."
+    },
+    {
+      id:"q10", type:"num", title:"Luas Juring",
+      q:"Sebuah taman berbentuk lingkaran memiliki jari-jari 10 m. Sebagian taman membentuk juring dengan sudut pusat 144°. Gunakan π = 3,14. Berapakah luas bagian tersebut?",
+      unit:"m²", answer:125.60,
+      correct:"Luas penuh = 314,00 m². Karena 144/360 = 0,4, luas juring = 0,4 × 314 = 125,60 m².",
+      wrong:"Cari luas lingkaran penuh terlebih dahulu, lalu kalikan dengan 144/360."
+    }
+  ];
+
+  // ===============================
+  // DOM REFERENCES
+  // ===============================
+  const content = document.getElementById("content");
+  const header = document.getElementById("appHeader");
+  const bottomNav = document.getElementById("bottomNav");
+  const headerTitle = document.getElementById("headerTitle");
+  const headerUser = document.getElementById("headerUser");
+  const headerStep = document.getElementById("headerStep");
+  const headerProgressFill = document.getElementById("headerProgressFill");
+  const btnMenu = document.getElementById("btnMenu");
+  const btnBack = document.getElementById("btnBack");
+  const btnNext = document.getElementById("btnNext");
+
+  // ===============================
+  // HELPERS
+  // ===============================
+  function fmt(n){
+    return Number(n).toFixed(2).replace(".", ",");
+  }
+
+  function num(value){
+    const parsed = parseFloat(String(value ?? "").trim().replace(",", "."));
+    return Number.isFinite(parsed) ? parsed : NaN;
+  }
+
+  function approx(a,b,tol=.01){
+    return Number.isFinite(a) && Math.abs(a-b) <= tol;
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[s]));
+  }
+
+  function setHeader(title, detail=""){
+    headerTitle.textContent = title;
+    headerUser.textContent = `Penjelajah: ${state.namaSiswa || "-"} | ${state.kelasSiswa || "-"}`;
+    headerStep.textContent = detail || `Misi ${progressCount()}/5`;
+    headerProgressFill.style.width = `${(progressCount()/5)*100}%`;
+  }
+
+  function showShell(show){
+    header.classList.toggle("hidden", !show);
+    bottomNav.classList.toggle("hidden", !show);
+    content.classList.toggle("no-nav", !show);
+  }
+
+  function go(screen, sub=0){
+    if(!state.identitasValid && !["pembuka","konfirmasi"].includes(screen)){
+      screen = "pembuka";
+      sub = 0;
+    }
+    state.screen = screen;
+    state.sub = sub;
+    saveState();
+    render();
+  }
+
+  function markLessonIfCompleted(index){
+    const page = learningPages[index];
+    if(!page) return;
+    const key = page.key;
+    const lastIndexForKey = [...learningPages].map((x,i)=>({x,i})).filter(o=>o.x.key===key).pop().i;
+    if(index === lastIndexForKey){
+      state.materiSelesai[key] = true;
+      saveState();
+    }
+  }
+
+  // ===============================
+  // RENDER ROOT
+  // ===============================
+  function render(){
+    if(!state.identitasValid && !["pembuka","konfirmasi"].includes(state.screen)){
+      state.screen = "pembuka";
+      state.sub = 0;
+    }
+
+    const requiresShell = state.identitasValid && state.screen !== "pembuka" && state.screen !== "konfirmasi";
+    showShell(requiresShell);
+
+    const renderers = {
+      pembuka:renderOpening,
+      konfirmasi:renderConfirmation,
+      menu:renderMenu,
+      tujuan:renderGoals,
+      materi:renderMaterial,
+      belajar:renderLearning,
+      evaluasi:renderQuiz,
+      hasil:renderResult,
+      pembahasan:renderReview,
+      simulasi:renderSimulation
+    };
+
+    (renderers[state.screen] || renderOpening)();
+    content.scrollTop = 0;
+    updateNav();
+  }
+
+  // ===============================
+  // OPENING / IDENTITY
+  // ===============================
+  function renderOpening(){
+    showShell(false);
+    content.innerHTML = `
+      <div class="page">
+        <section class="hero">
+          <div class="planet-logo" aria-hidden="true">π</div>
+          <h1>Ekspedisi Planet Lingkaran</h1>
+          <p>Misi Menaklukkan Geometri — belajar pelan-pelan, lihat pola, pahami konsep, lalu coba sendiri.</p>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">🚀 Gerbang Identitas</h2>
+          <p class="subtle">Isi identitas sebelum memulai. Nama dan kelas akan disimpan <b>hanya di browser/perangkat ini</b> menggunakan localStorage.</p>
+
+          <div class="field">
+            <label for="namaInput">Nama Siswa</label>
+            <input id="namaInput" type="text" autocomplete="name" placeholder="Ketik nama lengkap" value="${escapeHtml(state.namaSiswa || "")}">
+          </div>
+
+          <div class="field">
+            <label for="kelasInput">Kelas</label>
+            <select id="kelasInput">
+              <option value="">Pilih Kelas</option>
+              <option value="9A" ${state.kelasSiswa==="9A"?"selected":""}>9A</option>
+              <option value="9B" ${state.kelasSiswa==="9B"?"selected":""}>9B</option>
+            </select>
+          </div>
+
+          <button id="startBtn" class="btn primary block">MULAI EKSPEDISI 🚀</button>
+          <div id="identityMsg" aria-live="polite"></div>
+        </section>
+
+        ${state.identitasValid ? `
+        <section class="card">
+          <h3 class="card-title">Data tersimpan di perangkat ini</h3>
+          <p class="subtle">Nama: <b>${escapeHtml(state.namaSiswa)}</b> · Kelas: <b>${escapeHtml(state.kelasSiswa)}</b></p>
+          <div class="inline-actions">
+            <button id="resumeBtn" class="btn purple">LANJUTKAN SESI</button>
+            <button id="clearBtn" class="btn danger">HAPUS DATA LOKAL</button>
+          </div>
+        </section>` : ""}
+
+        <div class="footer-note">Matematika Kelas IX · Materi Lingkaran · Bahasa Indonesia</div>
+      </div>
+    `;
+
+    const namaInput = document.getElementById("namaInput");
+    const kelasInput = document.getElementById("kelasInput");
+    const startBtn = document.getElementById("startBtn");
+    const msg = document.getElementById("identityMsg");
+
+    startBtn.addEventListener("click", () => {
+      const nama = namaInput.value.trim();
+      const kelas = kelasInput.value;
+      if(!nama && !kelas){
+        msg.innerHTML = `<div class="notice warn">Nama dan Kelas wajib diisi sebelum memulai ekspedisi.</div>`;
+        return;
+      }
+      if(!nama){
+        msg.innerHTML = `<div class="notice warn">Silakan isi Nama terlebih dahulu.</div>`;
+        return;
+      }
+      if(!["9A","9B"].includes(kelas)){
+        msg.innerHTML = `<div class="notice warn">Silakan pilih Kelas 9A atau 9B.</div>`;
+        return;
+      }
+      state.namaSiswa = nama;
+      state.kelasSiswa = kelas;
+      state.identitasValid = true;
+      saveState();
+      go("konfirmasi");
+    });
+
+    document.getElementById("resumeBtn")?.addEventListener("click",()=>go("menu"));
+    document.getElementById("clearBtn")?.addEventListener("click", async ()=>{
+      if(confirm("Hapus semua data lokal dan mulai sebagai siswa baru di perangkat ini?")){
+        localStorage.removeItem(STORAGE_KEY);
+        state = {...defaultState, materiSelesai:{...defaultState.materiSelesai}};
+        transient.materialMatched = {};
+        await startFreshCloudIdentity();
+        render();
+      }
+    });
+  }
+
+  function renderConfirmation(){
+    showShell(false);
+    content.innerHTML = `
+      <div class="page">
+        <section class="hero">
+          <div class="planet-logo" aria-hidden="true">🚀</div>
+          <h1>Identitas Tercatat</h1>
+          <p>Periksa kembali sebelum memasuki pusat kendali.</p>
+        </section>
+        <section class="card">
+          <h2 class="card-title">Halo, ${escapeHtml(state.namaSiswa)}!</h2>
+          <p class="subtle">Kamu terdaftar sebagai penjelajah dari kelas <b>${escapeHtml(state.kelasSiswa)}</b>.</p>
+          <div class="notice info">Data ini akan tetap tersimpan pada browser/perangkat ini sampai data lokal dihapus.</div>
+          <div class="inline-actions" style="margin-top:14px">
+            <button id="confirmIdentity" class="btn primary">BENAR, LANJUTKAN</button>
+            <button id="editIdentity" class="btn ghost">UBAH IDENTITAS</button>
+          </div>
+        </section>
+      </div>
+    `;
+    document.getElementById("confirmIdentity").addEventListener("click",()=>go("menu"));
+    document.getElementById("editIdentity").addEventListener("click",()=>go("pembuka"));
+  }
+
+  // ===============================
+  // MENU / GOALS
+  // ===============================
+  function renderMenu(){
+    setHeader("Pusat Kendali Ekspedisi");
+    markVisited("menu");
+    const p = progressCount();
+    const nextKey = getNextPlanetKey();
+    const nextMeta = planetMeta.find(x => x.key === nextKey);
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">Pusat Kendali Ekspedisi</h1>
+        <p class="section-sub">Selamat datang, <b>${escapeHtml(state.namaSiswa)}</b> dari kelas <b>${escapeHtml(state.kelasSiswa)}</b>. Pilih misi berikutnya.</p>
+
+        <section class="card" style="overflow:hidden;position:relative">
+          <div style="position:absolute;width:180px;height:180px;border-radius:50%;right:-60px;top:-70px;background:radial-gradient(circle,rgba(123,97,255,.18),transparent 68%);pointer-events:none"></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;position:relative">
+            <div>
+              <div class="badge" style="margin-bottom:8px">🌌 Rute Galaksi</div>
+              <b style="color:var(--navy);font-size:20px">Progres Ekspedisi</b>
+              <div class="tiny">${p}/5 planet selesai</div>
+            </div>
+            <div style="font-size:42px">${p===5?"🏆":"🚀"}</div>
+          </div>
+          <div class="progress-track" style="margin-top:14px;background:#EAF0F8">
+            <div class="progress-fill" style="width:${p*20}%"></div>
+          </div>
+          <div class="cosmic-divider"></div>
+          <div class="tiny">${p===5 ? "Semua planet sudah ditaklukkan. Saatnya meninjau atau mengulang misi." : `Planet berikutnya yang terbuka: <b>${nextMeta.code} — ${nextMeta.name}</b>.`}</div>
+        </section>
+
+        <div class="menu-grid">
+          ${menuCard("🚀","Pembuka","Sapaan dan identitas penjelajah.","pembuka",true)}
+          ${menuCard("🎯","Tujuan Pembelajaran","Lihat target yang akan dikuasai.","tujuan",!!state.visited.tujuan)}
+          ${menuCard("🪐","Materi Pembelajaran","Kenali unsur lingkaran dan π.","materi",!!state.visited.materi)}
+          ${menuCard("🧭","Pembelajaran Bertahap",`Lanjut ke ${nextMeta.name} atau pilih planet dari submenu.`,"belajar",p>0 || state.visited.belajar)}
+          ${menuCard("📝","Evaluasi",state.evaluasiSelesai?`Nilai terakhir: ${state.nilaiAkhir}`:"10 soal bervariasi.","evaluasi",state.evaluasiSelesai)}
+          ${menuCard("🎮","Simulator Orbit","Eksperimen jari-jari, busur, dan juring.","simulasi",!!state.visited.simulasi)}
+        </div>
+
+        <section class="card" style="margin-top:14px">
+          <h3 class="card-title">🌍 Gerbang Planet Pembelajaran</h3>
+          <p class="subtle">Planet terbuka secara bertahap. Kamu dapat mengulang planet yang sudah selesai kapan saja, lalu melanjutkan ke planet berikutnya tanpa harus kembali ke Planet 1.</p>
+          <div class="planet-selector-grid">
+            ${planetMeta.map((meta, idx) => {
+              const unlocked = isPlanetUnlocked(meta.key);
+              const done = !!state.materiSelesai[meta.key];
+              const startIndex = getPlanetStartIndex(meta.key);
+              const statusText = done ? "✅ Selesai" : (unlocked ? "🟢 Terbuka" : "🔒 Terkunci");
+              const statusClass = done ? "done" : (unlocked ? "open" : "locked");
+              const actionText = done ? "ULANGI PLANET" : (unlocked ? "MASUK PLANET" : "TERKUNCI");
+              return `
+                <div class="planet-selector ${!unlocked && !done ? "locked" : ""}">
+                  <div class="planet-visual ${meta.accent}">${meta.emoji}</div>
+                  <div class="planet-code">${meta.code}</div>
+                  <h4>${meta.name}</h4>
+                  <div class="planet-topic">${meta.topic}</div>
+                  <div class="planet-desc">${meta.desc}</div>
+                  <div class="planet-footer">
+                    <span class="planet-status ${statusClass}">${statusText}</span>
+                    <button class="planet-enter" data-planet-key="${meta.key}" data-planet-index="${startIndex}" ${(!unlocked && !done) ? "disabled" : ""}>${actionText}</button>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:14px">
+          <h3 class="card-title">Status 5 Planet</h3>
+          ${planetMeta.map((meta,i)=>`
+            <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:${i<4?"1px solid #EAF0F8":"none"}">
+              <span>${meta.code} — ${meta.name} (${meta.topic})</span>
+              <b>${state.materiSelesai[meta.key]?"✅ Selesai":(isPlanetUnlocked(meta.key)?"🟢 Terbuka":"🔒 Terkunci")}</b>
+            </div>
+          `).join("")}
+        </section>
+      </div>
+    `;
+
+    document.querySelectorAll("[data-screen]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const s = btn.dataset.screen;
+        if(s==="pembuka"){
+          state.screen="pembuka"; saveState(); render();
+        }else if(s==="belajar"){
+          go("belajar", getPlanetStartIndex(getNextPlanetKey()));
+        }else{
+          go(s,0);
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-planet-key]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const key = btn.dataset.planetKey;
+        if(!isPlanetUnlocked(key) && !state.materiSelesai[key]) return;
+        go("belajar", getPlanetStartIndex(key));
+      });
+    });
+  }
+
+  function menuCard(icon,title,desc,screen,done){
+    return `
+      <button class="menu-card" data-screen="${screen}" aria-label="${title}">
+        <div>
+          <div class="icon">${icon}</div>
+          <h3>${title}</h3>
+          <p>${desc}</p>
+        </div>
+        <div><span class="badge ${done?"done":""}">${done?"✅ Sudah dibuka":"Buka"}</span></div>
+      </button>
+    `;
+  }
+
+  function renderGoals(){
+    setHeader("Tujuan Pembelajaran","Target Ekspedisi");
+    markVisited("tujuan");
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">🎯 Target Ekspedisi</h1>
+        <p class="section-sub">Setelah menyelesaikan MPI, kamu diharapkan dapat melakukan tiga hal berikut.</p>
+        <div class="target-grid">
+          <section class="target-card">
+            <div class="big">🔵</div>
+            <h3>Keliling & Luas</h3>
+            <p class="subtle">Menghitung keliling dan luas lingkaran menggunakan jari-jari atau diameter yang diberikan.</p>
+          </section>
+          <section class="target-card">
+            <div class="big">🟣</div>
+            <h3>Busur, Sudut & Juring</h3>
+            <p class="subtle">Menentukan panjang busur, hubungan sudut pusat dan sudut keliling, serta luas juring.</p>
+          </section>
+          <section class="target-card">
+            <div class="big">🟡</div>
+            <h3>Pemecahan Masalah</h3>
+            <p class="subtle">Menyelesaikan soal dengan urutan Diketahui → Ditanya → Rumus → Substitusi → Hitung → Kesimpulan.</p>
+          </section>
+        </div>
+        <section class="card" style="margin-top:14px">
+          <h3 class="card-title">Aturan penting</h3>
+          <p class="subtle">Setiap soal akan memberi tahu nilai π yang harus digunakan. Hasil hitungan ditampilkan minimal dua angka di belakang koma.</p>
+          <div class="formula">44,00 cm · 78,50 cm²</div>
+        </section>
+      </div>
+    `;
+  }
+
+  // ===============================
+  // MATERIAL
+  // ===============================
+  function renderMaterial(){
+    const idx = Math.max(0,Math.min(state.sub,materialPages.length-1));
+    setHeader(`Materi: ${materialPages[idx]}`,`${idx+1}/${materialPages.length}`);
+    markVisited("materi");
+    let body = "";
+
+    if(idx===0){
+      body = `
+        <section class="card">
+          <h2 class="card-title">Kenalan dengan Lingkaran</h2>
+          <p class="subtle">Sentuh tombol di bawah gambar untuk mengenali bagian-bagian lingkaran. Bagian yang dipilih akan <b>menyala</b>, diberi <b>panah animasi</b>, dan muncul penjelasan singkat.</p>
+          ${hotspotDiagram(transient.materialHotspot)}
+          <div class="hotspots">
+            ${["pusat","jari","diameter","busur","juring"].map(k=>`<button class="hotspot-btn ${transient.materialHotspot===k?"active":""}" data-hotspot="${k}">${({pusat:"Titik Pusat",jari:"Jari-jari",diameter:"Diameter",busur:"Busur",juring:"Juring"})[k]}</button>`).join("")}
+          </div>
+          <div id="hotspotInfo" class="notice info" style="margin-top:14px">
+            ${hotspotText(transient.materialHotspot)}
+          </div>
+        </section>
+
+        ${renderMatchActivity()}
+      `;
+    } else if(idx===1){
+      body = `
+        <section class="card">
+          <h2 class="card-title">Jari-jari dan Diameter</h2>
+          <div class="formula">d = 2 × r</div>
+          <div class="formula">r = d ÷ 2</div>
+          <div class="stepper">
+            <div class="step"><b>Diketahui:</b> diameter = 14 cm</div>
+            <div class="step"><b>Hitung:</b> r = 14 ÷ 2</div>
+            <div class="step"><b>Hasil:</b> r = 7,00 cm</div>
+          </div>
+          <h3 style="color:var(--navy);margin-top:18px">Latihan mikro</h3>
+          <p>Jika diameter 20 cm, berapa jari-jarinya?</p>
+          <div class="choice-list" id="microChoices">
+            ${["5,00 cm","10,00 cm","20,00 cm","40,00 cm"].map((o,i)=>`<button class="choice" data-micro="${i}">${o}</button>`).join("")}
+          </div>
+          <div id="microFeedback"></div>
+        </section>
+      `;
+    } else if(idx===2){
+      body = `
+        <section class="card">
+          <h2 class="card-title">Mengenal π</h2>
+          <p class="subtle"><b>π dibaca “pi”.</b> Pi digunakan untuk menghitung ukuran-ukuran pada lingkaran.</p>
+          <div class="formula">π ≈ 3,14</div>
+          <div class="formula">π ≈ 22/7</div>
+          <div class="notice info">Pada setiap soal di MPI ini, nilai π yang harus digunakan akan diberikan. Kamu tidak perlu menebak.</div>
+        </section>
+      `;
+    } else {
+      const names = ["Keliling","Luas","Panjang Busur","Sudut Lingkaran","Luas Juring"];
+      body = `
+        <section class="card">
+          <h2 class="card-title">Peta Lima Planet</h2>
+          <p class="subtle">Setiap planet memuat konsep yang saling terhubung.</p>
+          <div class="planet-path" style="margin-top:14px">
+            ${names.map((n,i)=>`
+              <div class="planet-stop">
+                <div class="planet-dot p${i+1}">${["🌐","🪐","☄️","🛰️","🌙"][i]}</div>
+                <div>
+                  <b style="color:var(--navy)">Planet ${i+1}: ${n}</b>
+                  <div class="tiny">${i===0?"Mulai dari panjang tepi.":i===1?"Lanjut ke daerah di dalam lingkaran.":i===2?"Pelajari sebagian keliling.":i===3?"Hubungkan sudut pusat dan keliling.":"Pelajari sebagian luas lingkaran."}</div>
+                </div>
+                <span class="badge ${state.materiSelesai[["keliling","luas","busur","sudut","juring"][i]]?"done":""}">
+                  ${state.materiSelesai[["keliling","luas","busur","sudut","juring"][i]]?"✅":"○"}
+                </span>
+              </div>`).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">🪐 Materi Pembelajaran</h1>
+        <p class="section-sub">Bagian ${idx+1} dari ${materialPages.length}</p>
+        ${body}
+      </div>
+    `;
+
+    document.querySelectorAll("[data-hotspot]").forEach(b=>{
+      b.addEventListener("click",()=>{
+        transient.materialHotspot = b.dataset.hotspot;
+        renderMaterial();
+      });
+    });
+
+    document.querySelectorAll("[data-micro]").forEach(b=>{
+      b.addEventListener("click",()=>{
+        const i = +b.dataset.micro;
+        document.querySelectorAll("[data-micro]").forEach(x=>x.classList.remove("selected","correct","wrong"));
+        b.classList.add(i===1?"correct":"wrong");
+        document.getElementById("microFeedback").innerHTML = i===1
+          ? `<div class="notice ok">✅ Benar. Jari-jari adalah setengah dari diameter: 20 ÷ 2 = 10,00 cm.</div>`
+          : `<div class="notice bad">⚠️ Belum tepat. Diameter harus dibagi dua untuk memperoleh jari-jari.</div>`;
+      });
+    });
+
+    document.querySelectorAll("[data-match-label]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const key = btn.dataset.matchLabel;
+        if(transient.materialMatched[key]) return;
+        transient.materialMatchSelected = transient.materialMatchSelected === key ? null : key;
+        renderMaterial();
+      });
+      btn.addEventListener("dragstart",(e)=>{
+        const key = btn.dataset.matchLabel;
+        if(transient.materialMatched[key]) return e.preventDefault();
+        e.dataTransfer.setData("text/plain", key);
+        transient.materialMatchSelected = key;
+      });
+    });
+
+    document.querySelectorAll("[data-diagram-target]").forEach(target=>{
+      target.addEventListener("click",()=>{
+        handleMatchAttempt(target.dataset.diagramTarget, transient.materialMatchSelected);
+      });
+      target.addEventListener("dragover",(e)=>e.preventDefault());
+      target.addEventListener("drop",(e)=>{
+        e.preventDefault();
+        const selected = e.dataTransfer.getData("text/plain") || transient.materialMatchSelected;
+        handleMatchAttempt(target.dataset.diagramTarget, selected);
+      });
+    });
+
+    document.getElementById("resetMatchBtn")?.addEventListener("click",()=>{
+      transient.materialMatchSelected = null;
+      transient.materialMatched = {};
+      transient.materialMatchFeedback = "";
+      renderMaterial();
+    });
+  }
+
+  function hotspotText(k){
+    const map = {
+      pusat:"<b>Titik pusat:</b> titik yang berada tepat di tengah lingkaran. Pada gambar ditandai oleh titik <b>O</b>.",
+      jari:"<b>Jari-jari:</b> garis dari titik pusat <b>O</b> menuju tepi lingkaran, misalnya <b>OA</b>.",
+      diameter:"<b>Diameter:</b> garis lurus yang melalui pusat <b>O</b> dan menghubungkan dua titik pada lingkaran.",
+      busur:"<b>Busur:</b> bagian dari keliling lingkaran, misalnya lengkungan dari titik <b>A</b> ke <b>B</b>.",
+      juring:"<b>Juring:</b> daerah yang dibatasi dua jari-jari <b>OA</b> dan <b>OB</b>, serta busur <b>AB</b>."
+    };
+    return map[k] || "Pilih salah satu bagian lingkaran untuk melihat penjelasannya. Bagian yang dipilih akan menyala, diberi panah animasi, dan muncul penjelasan singkat.";
+  }
+
+  function hotspotCallout(k){
+    const map = {
+      pusat:{
+        x:28,y:78,w:120,h:54, ax1:118, ay1:120, ax2:143, ay2:145, tx:"Titik pusat", sx:"berada tepat di tengah"
+      },
+      jari:{
+        x:160,y:44,w:112,h:54, ax1:205, ay1:98, ax2:225, ay2:146, tx:"Jari-jari", sx:"garis dari O ke tepi"
+      },
+      diameter:{
+        x:22,y:44,w:128,h:54, ax1:96, ay1:95, ax2:104, ay2:147, tx:"Diameter", sx:"garis lurus melalui O"
+      },
+      busur:{
+        x:178,y:214,w:102,h:54, ax1:225, ay1:212, ax2:218, ay2:240, tx:"Busur", sx:"bagian lengkung tepi"
+      },
+      juring:{
+        x:18,y:210,w:132,h:54, ax1:132, ay1:226, ax2:164, ay2:206, tx:"Juring", sx:"daerah di antara OA, OB, dan AB"
+      }
+    };
+    return map[k] || null;
+  }
+
+  function hotspotDiagram(k){
+    const active = (name) => k === name ? "active" : "";
+    const callout = hotspotCallout(k);
+    return `
+      <div class="diagram-block">
+        <div class="circle-visual">
+          <svg viewBox="0 0 300 300" class="circle-svg" aria-label="Diagram unsur lingkaran">
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#FFD166" flood-opacity="0.95"/>
+            </filter>
+            <filter id="glowSoft" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#2A4675" flood-opacity="0.20"/>
+            </filter>
+          </defs>
+
+          <circle class="base-circle" cx="150" cy="150" r="118"></circle>
+
+          <!-- Juring -->
+          <path class="svg-juring ${active("juring")}"
+            d="M150 150 L268 150 A118 118 0 0 1 191.52 260.45 Z"></path>
+
+          <!-- Diameter -->
+          <path class="svg-diameter ${active("diameter")}" d="M32 150 L268 150"></path>
+
+          <!-- Jari-jari OA dan OB -->
+          <path class="svg-jari ${active("jari")}" d="M150 150 L268 150"></path>
+          <path class="svg-jari ${active("juring")}" d="M150 150 L191.52 260.45"></path>
+
+          <!-- Busur AB -->
+          <path class="svg-busur ${active("busur")} ${active("juring")}" d="M268 150 A118 118 0 0 1 191.52 260.45"></path>
+
+          <!-- Titik pusat -->
+          <circle class="svg-pusat ${active("pusat")}" cx="150" cy="150" r="9"></circle>
+
+          <!-- Label titik O, A, B -->
+          <circle class="point-badge" cx="150" cy="132" r="13"></circle>
+          <text class="point-label" x="150" y="132">O</text>
+
+          <circle class="point-badge" cx="281" cy="150" r="13"></circle>
+          <text class="point-label" x="281" y="150">A</text>
+
+          <circle class="point-badge" cx="197" cy="278" r="13"></circle>
+          <text class="point-label" x="197" y="278">B</text>
+
+          ${callout ? `
+            <line class="callout-arrow" x1="${callout.ax1}" y1="${callout.ay1}" x2="${callout.ax2}" y2="${callout.ay2}"></line>
+            <circle class="callout-dot" cx="${callout.ax2}" cy="${callout.ay2}" r="6"></circle>
+            <rect class="callout-bubble" x="${callout.x}" y="${callout.y}" width="${callout.w}" height="${callout.h}" rx="16" ry="16"></rect>
+            <text class="callout-title" x="${callout.x + 10}" y="${callout.y + 20}">${callout.tx}</text>
+            <text class="callout-sub" x="${callout.x + 10}" y="${callout.y + 38}">${callout.sx}</text>
+          ` : ``}
+          </svg>
+        </div>
+        <div class="diagram-caption">
+          ${k
+            ? `Bagian <b>${({pusat:"titik pusat",jari:"jari-jari",diameter:"diameter",busur:"busur",juring:"juring"})[k]}</b> sedang di-highlight.`
+            : "Klik salah satu istilah di bawah. Diagram akan menampilkan highlight, panah animasi, dan penjelas singkat."
+          }
+        </div>
+        <div class="point-legend">
+          <span class="badge">O = titik pusat</span>
+          <span class="badge">A dan B = titik pada lingkaran</span>
+          <span class="badge">Busur AB & Juring AOB</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMatchActivity(){
+    const labels = [
+      ["pusat","Titik Pusat"],
+      ["jari","Jari-jari"],
+      ["diameter","Diameter"],
+      ["busur","Busur"],
+      ["juring","Juring"]
+    ];
+    const allDone = labels.every(([key]) => transient.materialMatched[key]);
+    return `
+      <section class="card">
+        <h2 class="card-title">Latihan Cocokkan Unsur</h2>
+        <p class="subtle">Seret label ke target yang sesuai, atau ketuk label lalu ketuk target pada gambar. Aktivitas ini membantu siswa mencocokkan nama unsur dengan letaknya.</p>
+        <div class="match-activity">
+          <div class="match-chips">
+            ${labels.map(([key,label]) => `
+              <button
+                class="match-chip ${transient.materialMatchSelected===key ? "selected" : ""} ${transient.materialMatched[key] ? "done" : ""}"
+                data-match-label="${key}"
+                draggable="${transient.materialMatched[key] ? "false" : "true"}"
+              >
+                ${transient.materialMatched[key] ? "✅ " : ""}${label}
+              </button>
+            `).join("")}
+          </div>
+
+          <div class="match-board">
+            <div class="match-board-wrap">
+              ${hotspotDiagram(transient.materialHotspot)}
+              ${renderMatchTargets()}
+            </div>
+            <div class="drag-tip">Tip: pilih/seret label, lalu cocokkan dengan target 1–5 pada gambar.</div>
+          </div>
+        </div>
+        <div id="matchFeedback">
+          ${allDone
+            ? `<div class="notice ok">🎉 Hebat! Semua unsur sudah berhasil dicocokkan.</div>`
+            : (transient.materialMatchFeedback || `<div class="notice info">Cocokkan: 1 = titik pusat, 2 = jari-jari, 3 = diameter, 4 = busur, 5 = juring.</div>`)
+          }
+        </div>
+        <div class="inline-actions" style="margin-top:12px">
+          <button id="resetMatchBtn" class="btn ghost">ULANGI PENCOCOKAN</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderMatchTargets(){
+    const names = {
+      pusat:"Titik Pusat",
+      jari:"Jari-jari",
+      diameter:"Diameter",
+      busur:"Busur",
+      juring:"Juring"
+    };
+    const positions = {
+      pusat:"left:123px; top:123px;",
+      jari:"left:206px; top:117px;",
+      diameter:"left:116px; top:40px;",
+      busur:"left:212px; top:208px;",
+      juring:"left:100px; top:200px;"
+    };
+    const order = ["pusat","jari","diameter","busur","juring"];
+    return order.map((key,idx) => {
+      const matched = !!transient.materialMatched[key];
+      return `
+        <button
+          class="match-target ${transient.materialMatchSelected ? "ready" : ""} ${matched ? "matched" : ""}"
+          style="${positions[key]}"
+          data-diagram-target="${key}"
+          title="${names[key]}"
+          aria-label="Target ${idx+1}: ${names[key]}"
+        >
+          ${matched ? names[key] : `<small>${idx+1}</small>`}
+        </button>
+      `;
+    }).join("");
+  }
+
+  function handleMatchAttempt(targetKey, selectedKey){
+    const names = {
+      pusat:"Titik Pusat",
+      jari:"Jari-jari",
+      diameter:"Diameter",
+      busur:"Busur",
+      juring:"Juring"
+    };
+    if(!selectedKey){
+      transient.materialMatchFeedback = `<div class="notice warn">Pilih atau seret dulu salah satu label unsur lingkaran.</div>`;
+      renderMaterial();
+      return;
+    }
+    if(targetKey === selectedKey){
+      transient.materialMatched[targetKey] = true;
+      transient.materialMatchSelected = null;
+      transient.materialMatchFeedback = `<div class="notice ok">✅ Benar! <b>${names[targetKey]}</b> berhasil dicocokkan dengan gambar.</div>`;
+    } else {
+      transient.materialMatchFeedback = `<div class="notice bad">⚠️ Belum tepat. Kamu memilih <b>${names[selectedKey]}</b>, tetapi target ini bukan bagiannya.</div>`;
+    }
+    renderMaterial();
+  }
+
+  // ===============================
+  // LEARNING PAGES
+  // ===============================
+  function renderLearning(){
+    const idx = Math.max(0,Math.min(state.sub,learningPages.length-1));
+    const p = learningPages[idx];
+    const meta = planetMeta.find(x => x.key === p.key);
+    const planetLabel = meta ? `${meta.code} • ${meta.name}` : p.planet;
+    setHeader(`${planetLabel} — ${p.title}`,`${idx+1}/${learningPages.length}`);
+    markVisited("belajar");
+    let body = learningBody(p.type);
+
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">${planetLabel} — ${p.title}</h1>
+        <p class="section-sub">${meta ? `<b>${meta.name}</b> — ${meta.topic}.` : "Pola belajar:"} Pola belajar: Amati → Pahami → Contoh → Coba.</p>
+        ${body}
+      </div>
+    `;
+    bindLearningEvents(p,idx);
+  }
+
+  function learningBody(type){
+    const blocks = {
+      "keliling-amati":`
+        <section class="card">
+          <h2 class="card-title">Amati satu putaran penuh</h2>
+          <div id="orbitDemo" class="orbit-demo"></div>
+          <button id="spinBtn" class="btn primary block">PUTAR SATU KALI</button>
+          <div class="notice info">Panjang seluruh tepi lingkaran disebut <b>keliling</b>.</div>
+        </section>`,
+      "keliling-rumus":`
+        <section class="card">
+          <h2 class="card-title">Dua bentuk rumus keliling</h2>
+          <p class="subtle">Jika diketahui jari-jari:</p><div class="formula">K = 2 × π × r</div>
+          <p class="subtle">Jika diketahui diameter:</p><div class="formula">K = π × d</div>
+          <div class="notice info">K = keliling · r = jari-jari · d = diameter · π = pi</div>
+        </section>`,
+      "keliling-contoh":exampleCard(
+        "Sebuah lingkaran memiliki jari-jari 7 cm. Gunakan π = 22/7. Hitung kelilingnya.",
+        [
+          ["Diketahui","r = 7 cm · π = 22/7"],
+          ["Ditanya","Keliling = ?"],
+          ["Rumus","K = 2 × π × r"],
+          ["Substitusi","K = 2 × 22/7 × 7"],
+          ["Hitung","K = 44"],
+          ["Kesimpulan","K = 44,00 cm"]
+        ]
+      ),
+      "keliling-latihan":practiceCard("Diameter sebuah lingkaran 10 cm. Gunakan π = 3,14. Berapa kelilingnya?","cm","31.40",
+        ["Yang diketahui adalah diameter.","Gunakan K = π × d.","K = 3,14 × 10."],
+        "Tepat. Karena diketahui diameter, K = π × d = 31,40 cm.",
+        "Belum tepat. Periksa kembali nilai diameter dan rumus yang digunakan."),
+      "luas-amati":`
+        <section class="card">
+          <h2 class="card-title">Tepi atau daerah di dalam?</h2>
+          <div class="circle-diagram" style="background:radial-gradient(circle at center,#DDF3FF 0 68%,#B9E3FF 69% 100%)"></div>
+          <div class="notice info"><b>Keliling</b> membahas panjang tepi. <b>Luas</b> membahas seluruh daerah di dalam lingkaran.</div>
+        </section>`,
+      "luas-rumus":`
+        <section class="card">
+          <h2 class="card-title">Rumus Luas</h2>
+          <div class="formula">L = π × r<sup>2</sup></div>
+          <div class="formula" style="font-size:28px">r<sup>2</sup> = r × r</div>
+          <div class="notice warn">Yang dikuadratkan adalah <b>jari-jari</b>, bukan π.</div>
+        </section>`,
+      "luas-contoh":exampleCard(
+        "Jari-jari lingkaran 5 cm. Gunakan π = 3,14.",
+        [
+          ["Diketahui","r = 5 cm"],
+          ["Rumus","L = π × r²"],
+          ["Substitusi","L = 3,14 × 5²"],
+          ["Ubah kuadrat","L = 3,14 × 25"],
+          ["Hitung","L = 78,5"],
+          ["Kesimpulan","L = 78,50 cm²"]
+        ]
+      ),
+      "luas-latihan":practiceCard("Jari-jari lingkaran 10 cm. Gunakan π = 3,14. Berapakah luasnya?","cm²","314",
+        ["Rumus luas menggunakan jari-jari.","Gunakan L = π × r².","10² = 10 × 10 = 100."],
+        "Benar. L = 3,14 × 10² = 314,00 cm².",
+        "Belum tepat. Ingat bahwa 10² berarti 10 × 10."),
+      "busur-kenal":`
+        <section class="card">
+          <h2 class="card-title">Busur = sebagian tepi</h2>
+          <div class="sector-wrap"><div class="sector" style="background:conic-gradient(var(--blue) 0deg 110deg,#E5EDF7 110deg 360deg)"></div></div>
+          <div class="notice info"><b>Keliling</b> = seluruh tepi lingkaran.<br><b>Busur</b> = sebagian tepi lingkaran.</div>
+        </section>`,
+      "busur-hubungan":`
+        <section class="card">
+          <h2 class="card-title">Sudut menentukan panjang bagian busur</h2>
+          <div class="slider-row">
+            <input id="busurAngleSlider" type="range" min="0" max="360" step="10" value="${transient.simAngle}">
+            <b id="busurAngleValue">${transient.simAngle}°</b>
+          </div>
+          <div id="busurSector" class="sector" style="margin:12px auto;background:conic-gradient(var(--blue) 0deg ${transient.simAngle}deg,#E5EDF7 ${transient.simAngle}deg 360deg)"></div>
+          <div class="notice info" id="busurFraction">${fractionText(transient.simAngle)}</div>
+        </section>`,
+      "busur-rumus":`
+        <section class="card">
+          <h2 class="card-title">Rumus Panjang Busur</h2>
+          <div class="formula">PB = θ/360° × 2 × π × r</div>
+          <div class="notice info">PB = panjang busur · θ = sudut pusat.</div>
+        </section>`,
+      "busur-contoh":exampleCard(
+        "r = 21 cm · θ = 60° · π = 22/7",
+        [
+          ["Rumus","PB = θ/360° × 2 × π × r"],
+          ["Substitusi","PB = 60/360 × 2 × 22/7 × 21"],
+          ["Sederhanakan","PB = 1/6 × 132"],
+          ["Hitung","PB = 22"],
+          ["Kesimpulan","PB = 22,00 cm"]
+        ]
+      ),
+      "busur-latihan":practiceCard("r = 14 cm, θ = 90°, π = 22/7. Berapa panjang busurnya?","cm","22",
+        ["90° adalah seperempat dari 360°.","Hitung keliling penuh terlebih dahulu.","Keliling = 88 cm, lalu ambil 1/4-nya."],
+        "Tepat. 90° = 1/4 putaran, sehingga 1/4 × 88 = 22,00 cm.",
+        "Belum tepat. Coba lihat bahwa 90° adalah seperempat dari 360°."),
+      "sudut-pusat":`
+        <section class="card">
+          <h2 class="card-title">Sudut Pusat</h2>
+          <div class="circle-diagram">
+            <div class="center-dot"></div>
+            <div class="radius-line" style="transform:rotate(-25deg)"></div>
+            <div class="radius-line" style="transform:rotate(40deg)"></div>
+          </div>
+          <div class="notice info">Sudut pusat adalah sudut yang <b>titik sudutnya berada di pusat lingkaran</b>.</div>
+        </section>`,
+      "sudut-keliling":`
+        <section class="card">
+          <h2 class="card-title">Sudut Keliling</h2>
+          <div class="circle-diagram" style="display:grid;place-items:center">
+            <div style="position:absolute;bottom:20px;font-size:34px">∠</div>
+          </div>
+          <div class="notice info">Sudut keliling adalah sudut yang <b>titik sudutnya berada pada keliling lingkaran</b>.</div>
+        </section>`,
+      "sudut-hubungan":`
+        <section class="card">
+          <h2 class="card-title">Jika menghadap busur yang sama</h2>
+          <div class="formula">Sudut pusat = 2 × sudut keliling</div>
+          <div class="formula">Sudut keliling = 1/2 × sudut pusat</div>
+          <div class="notice info">Pastikan kedua sudut menghadap <b>busur yang sama</b>.</div>
+        </section>`,
+      "sudut-contoh":exampleCard(
+        "Sudut pusat AOB = 120°. Berapa sudut keliling ACB yang menghadap busur yang sama?",
+        [
+          ["Rumus","Sudut keliling = 1/2 × sudut pusat"],
+          ["Substitusi","= 1/2 × 120°"],
+          ["Kesimpulan","= 60°"]
+        ]
+      ),
+      "sudut-diameter":`
+        <section class="card">
+          <h2 class="card-title">Sudut Keliling Menghadap Diameter</h2>
+          <div class="formula">1/2 × 180° = 90°</div>
+          <div class="notice info">Sudut keliling yang menghadap diameter selalu <b>90°</b>.</div>
+        </section>`,
+      "sudut-simulasi":`
+        <section class="card">
+          <h2 class="card-title">Geser titik C secara konsep</h2>
+          <p class="subtle">Gunakan slider untuk memindahkan posisi C di sepanjang setengah lingkaran. A dan B tetap menjadi ujung diameter.</p>
+          <input id="pointSlider" type="range" min="10" max="170" value="90">
+          <div class="circle-diagram" id="angleCircle">
+            <div class="diameter-line"></div>
+            <div id="movingPoint" style="position:absolute;width:18px;height:18px;background:var(--purple);border-radius:50%"></div>
+          </div>
+          <div class="formula">∠ACB = 90°</div>
+          <div class="notice info">Meskipun titik C berpindah, selama menghadap diameter AB, besar sudutnya tetap 90°.</div>
+        </section>`,
+      "juring-kenal":`
+        <section class="card">
+          <h2 class="card-title">Apa itu Juring?</h2>
+          <div class="sector-wrap"><div class="sector"></div></div>
+          <div class="notice info">Juring adalah daerah yang dibatasi oleh <b>dua jari-jari</b> dan <b>satu busur</b>.</div>
+        </section>`,
+      "juring-pecahan":`
+        <section class="card">
+          <h2 class="card-title">Pecahan Lingkaran</h2>
+          <div class="stat-grid">
+            ${[["360°","1 lingkaran"],["180°","1/2 lingkaran"],["90°","1/4 lingkaran"],["45°","1/8 lingkaran"]].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join("")}
+          </div>
+        </section>`,
+      "juring-rumus":`
+        <section class="card">
+          <h2 class="card-title">Rumus Luas Juring</h2>
+          <div class="formula">LJ = θ/360° × π × r<sup>2</sup></div>
+          <div class="notice info">Luas juring adalah <b>sebagian dari luas seluruh lingkaran</b>.</div>
+        </section>`,
+      "juring-contoh":exampleCard(
+        "r = 14 cm · θ = 90° · π = 22/7",
+        [
+          ["Luas penuh","L = 22/7 × 14 × 14 = 616 cm²"],
+          ["Bagian juring","90/360 = 1/4"],
+          ["Hitung","LJ = 1/4 × 616"],
+          ["Kesimpulan","LJ = 154,00 cm²"]
+        ]
+      ),
+      "juring-latihan":practiceCard("r = 10 cm, θ = 180°, π = 3,14. Berapa luas juringnya?","cm²","157",
+        ["180° adalah setengah dari 360°.","Cari luas lingkaran penuh terlebih dahulu.","Luas penuh = 314,00 cm², lalu ambil setengahnya."],
+        "Benar. 180° adalah setengah lingkaran, sehingga luas juring = 157,00 cm².",
+        "Belum tepat. Cari luas penuh, lalu ambil setengahnya.")
+    };
+    return blocks[type] || `<section class="card">Materi belum tersedia.</section>`;
+  }
+
+  function exampleCard(question, steps){
+    const visible = Math.max(0,transient.lessonStepCount);
+    return `
+      <section class="card">
+        <h2 class="card-title">Contoh Terbimbing</h2>
+        <p><b>${question}</b></p>
+        <div class="stepper">
+          ${steps.slice(0,visible).map(s=>`<div class="step"><b>${s[0]}:</b><br>${s[1]}</div>`).join("")}
+        </div>
+        ${visible < steps.length
+          ? `<button id="showStepBtn" class="btn primary block" style="margin-top:12px">LANJUT SATU LANGKAH</button>`
+          : `<div class="notice ok">✅ Semua langkah sudah terbuka. Perhatikan urutannya.</div>`}
+      </section>`;
+  }
+
+  function practiceCard(question,unit,answer,hints,ok,bad){
+    return `
+      <section class="card">
+        <h2 class="card-title">Coba Sendiri</h2>
+        <p><b>${question}</b></p>
+        <div class="field">
+          <label for="practiceInput">Jawaban</label>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
+            <input id="practiceInput" type="text" inputmode="decimal" placeholder="Ketik angka">
+            <b>${unit}</b>
+          </div>
+        </div>
+        <button id="checkPractice" class="btn primary block">PERIKSA JAWABAN</button>
+        <div class="hint-row">
+          ${hints.map((h,i)=>`<button class="btn yellow hintBtn" data-hint="${i+1}">💡 PETUNJUK ${i+1}</button>`).join("")}
+        </div>
+        <div id="practiceHint">${transient.hintLevel ? `<div class="notice info">${hints[transient.hintLevel-1]}</div>` : ""}</div>
+        <div id="practiceFeedback">${transient.practiceFeedback||""}</div>
+      </section>
+      <span id="practiceMeta" data-answer="${answer}" data-ok="${escapeHtml(ok)}" data-bad="${escapeHtml(bad)}"></span>
+    `;
+  }
+
+  function fractionText(angle){
+    if(angle===360) return "360° = satu lingkaran penuh.";
+    if(angle===180) return "180° = 1/2 lingkaran.";
+    if(angle===90) return "90° = 1/4 lingkaran.";
+    if(angle===45) return "45° = 1/8 lingkaran.";
+    return `${angle}° adalah ${fmt(angle/360*100)}% dari satu putaran penuh.`;
+  }
+
+  function bindLearningEvents(page,index){
+    document.getElementById("spinBtn")?.addEventListener("click",()=>{
+      const el = document.getElementById("orbitDemo");
+      el.classList.remove("spin"); void el.offsetWidth; el.classList.add("spin");
+    });
+
+    document.getElementById("showStepBtn")?.addEventListener("click",()=>{
+      transient.lessonStepCount++;
+      renderLearning();
+    });
+
+    document.querySelectorAll(".hintBtn").forEach(b=>{
+      b.addEventListener("click",()=>{
+        transient.hintLevel = +b.dataset.hint;
+        renderLearning();
+      });
+    });
+
+    document.getElementById("checkPractice")?.addEventListener("click",()=>{
+      const meta = document.getElementById("practiceMeta");
+      const ans = num(document.getElementById("practiceInput").value);
+      const expected = num(meta.dataset.answer);
+      if(!Number.isFinite(ans)){
+        transient.practiceFeedback = `<div class="notice warn">Masukkan jawaban berupa angka terlebih dahulu.</div>`;
+        transient.practiceAnswered = false;
+      } else if(approx(ans,expected)){
+        transient.practiceFeedback = `<div class="notice ok">✅ ${meta.dataset.ok}<br><b>Planet ini selesai. Tombol LANJUT sekarang aktif.</b></div>`;
+        transient.practiceAnswered = true;
+        markLessonIfCompleted(index);
+      } else {
+        transient.practiceFeedback = `<div class="notice bad">⚠️ ${meta.dataset.bad}</div>`;
+        transient.practiceAnswered = false;
+      }
+      renderLearning();
+      updateNav();
+    });
+
+    const busurSlider = document.getElementById("busurAngleSlider");
+    busurSlider?.addEventListener("input",()=>{
+      transient.simAngle = +busurSlider.value;
+      document.getElementById("busurAngleValue").textContent = `${transient.simAngle}°`;
+      document.getElementById("busurSector").style.background = `conic-gradient(var(--blue) 0deg ${transient.simAngle}deg,#E5EDF7 ${transient.simAngle}deg 360deg)`;
+      document.getElementById("busurFraction").textContent = fractionText(transient.simAngle);
+    });
+
+    const pointSlider = document.getElementById("pointSlider");
+    const movingPoint = document.getElementById("movingPoint");
+    if(pointSlider && movingPoint){
+      const updatePoint=()=>{
+        const deg = +pointSlider.value;
+        const rad = deg*Math.PI/180;
+        const R = 44;
+        const x = 50 + R*Math.cos(rad);
+        const y = 50 - R*Math.sin(rad);
+        movingPoint.style.left = `calc(${x}% - 9px)`;
+        movingPoint.style.top = `calc(${y}% - 9px)`;
+      };
+      pointSlider.addEventListener("input",updatePoint);
+      updatePoint();
+    }
+  }
+
+  // ===============================
+  // QUIZ
+  // ===============================
+  function renderQuiz(){
+    setHeader("Evaluasi — Ujian Komandan",`${Math.min(state.quizIndex+1,10)}/10`);
+    markVisited("evaluasi");
+
+    if(!state.evaluationAttemptId){
+      state.evaluationAttemptId = newUuid();
+      saveState();
+    }
+
+    if(state.evaluasiSelesai){
+      go("hasil");
+      return;
+    }
+
+    const i = Math.max(0,Math.min(state.quizIndex,quiz.length-1));
+    const q = quiz[i];
+    const saved = state.quizAnswers[q.id];
+
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">📝 Ujian Komandan</h1>
+        <section class="card">
+          <div class="quiz-head">
+            <b>Soal ${i+1} dari ${quiz.length}</b>
+            <span class="badge">${q.title}</span>
+          </div>
+          <div class="quiz-progress"><div style="width:${((i+1)/quiz.length)*100}%"></div></div>
+          <h2 class="card-title" style="margin-top:16px">${q.q}</h2>
+          ${renderQuizInput(q,saved)}
+          <div class="notice info" style="margin-top:14px">Jawaban evaluasi disimpan otomatis di browser perangkat ini.</div>
+        </section>
+      </div>
+    `;
+    bindQuizInput(q);
+
+    // Keep next button disabled until answered
+    btnNext.disabled = !isAnswered(q);
+    btnNext.textContent = i===quiz.length-1 ? "SELESAI →" : "LANJUT →";
+  }
+
+  function renderQuizInput(q,saved){
+    if(q.type==="mc" || q.type==="tf"){
+      return `<div class="choice-list">
+        ${q.options.map((o,i)=>`<button class="choice ${saved===i?"selected":""}" data-qchoice="${i}">${o}</button>`).join("")}
+      </div>`;
+    }
+    if(q.type==="num"){
+      return `<div class="field">
+        <label for="qnum">Jawaban</label>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
+          <input id="qnum" type="text" inputmode="decimal" placeholder="Ketik angka" value="${saved ?? ""}">
+          <b>${q.unit}</b>
+        </div>
+      </div>`;
+    }
+    if(q.type==="match"){
+      const obj = saved || {};
+      return `<div class="match-grid">
+        ${q.rows.map((r,i)=>`
+          <div class="match-row">
+            <b>${r[0]}</b>
+            <select data-match="${i}">
+              <option value="">Pilih pasangan</option>
+              ${q.choices.map(c=>`<option value="${escapeHtml(c)}" ${obj[i]===c?"selected":""}>${c}</option>`).join("")}
+            </select>
+          </div>`).join("")}
+      </div>`;
+    }
+    if(q.type==="order"){
+      const arr = saved || ["","","",""];
+      return `<div class="order-list">
+        ${q.items.map((item,i)=>`
+          <div class="order-row">
+            <select data-order="${i}" aria-label="Urutan untuk langkah ${i+1}">
+              <option value="">#</option>
+              ${[1,2,3,4].map(n=>`<option value="${n}" ${String(arr[i])===String(n)?"selected":""}>${n}</option>`).join("")}
+            </select>
+            <div class="step">${item}</div>
+          </div>`).join("")}
+        <div class="tiny">Pilih angka 1–4 untuk menunjukkan urutan setiap langkah.</div>
+      </div>`;
+    }
+    return "";
+  }
+
+  function bindQuizInput(q){
+    document.querySelectorAll("[data-qchoice]").forEach(b=>{
+      b.addEventListener("click",()=>{
+        state.quizAnswers[q.id] = +b.dataset.qchoice;
+        saveState();
+        renderQuiz();
+      });
+    });
+
+    document.getElementById("qnum")?.addEventListener("input",e=>{
+      state.quizAnswers[q.id] = e.target.value;
+      saveState();
+      btnNext.disabled = !isAnswered(q);
+    });
+
+    document.querySelectorAll("[data-match]").forEach(s=>{
+      s.addEventListener("change",()=>{
+        const obj = {...(state.quizAnswers[q.id]||{})};
+        obj[s.dataset.match] = s.value;
+        state.quizAnswers[q.id] = obj;
+        saveState();
+        btnNext.disabled = !isAnswered(q);
+      });
+    });
+
+    document.querySelectorAll("[data-order]").forEach(s=>{
+      s.addEventListener("change",()=>{
+        const arr = [...(state.quizAnswers[q.id]||["","","",""])];
+        arr[+s.dataset.order] = s.value;
+        state.quizAnswers[q.id] = arr;
+        saveState();
+        btnNext.disabled = !isAnswered(q);
+      });
+    });
+  }
+
+  function isAnswered(q){
+    const a = state.quizAnswers[q.id];
+    if(q.type==="mc" || q.type==="tf") return Number.isInteger(a);
+    if(q.type==="num") return a !== undefined && String(a).trim() !== "" && Number.isFinite(num(a));
+    if(q.type==="match") return a && q.rows.every((_,i)=>a[i]);
+    if(q.type==="order"){
+      return Array.isArray(a) && a.length===4 && a.every(Boolean) && new Set(a.map(String)).size===4;
+    }
+    return false;
+  }
+
+  function calculateScore(){
+    let total = 0;
+
+    quiz.forEach(q=>{
+      const a = state.quizAnswers[q.id];
+      if(q.type==="mc" || q.type==="tf"){
+        if(a===q.answer) total += 10;
+      } else if(q.type==="num"){
+        if(approx(num(a),q.answer)) total += 10;
+      } else if(q.type==="match"){
+        let right=0;
+        q.rows.forEach((r,i)=>{ if(a && a[i]===r[1]) right++; });
+        total += (right/q.rows.length)*10;
+      } else if(q.type==="order"){
+        let right=0;
+        if(Array.isArray(a)){
+          // each item should have the number matching its natural position (1..4)
+          a.forEach((v,i)=>{ if(String(v)===String(i+1)) right++; });
+        }
+        total += (right/4)*10;
+      }
+    });
+
+    state.nilaiAkhir = Math.round(total);
+    state.kategoriHasil =
+      state.nilaiAkhir >= 86 ? "Sangat Baik" :
+      state.nilaiAkhir >= 76 ? "Baik" :
+      state.nilaiAkhir >= 66 ? "Cukup" : "Perlu Latihan";
+    state.evaluasiSelesai = true;
+    saveState();
+    syncEvaluationResult().catch(err => {
+      console.error("Gagal menyimpan hasil evaluasi ke Supabase:", err);
+      setCloudStatus("error");
+    });
+  }
+
+  // ===============================
+  // RESULT / REVIEW
+  // ===============================
+  function renderResult(){
+    setHeader("Hasil Misi","Evaluasi selesai");
+    const stars = state.nilaiAkhir>=86 ? "⭐⭐⭐⭐⭐" : state.nilaiAkhir>=76 ? "⭐⭐⭐⭐" : state.nilaiAkhir>=66 ? "⭐⭐⭐" : "⭐⭐";
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">🏁 Hasil Misi</h1>
+        <section class="card">
+          <div class="result-score">${state.nilaiAkhir}</div>
+          <div class="result-cat">${state.kategoriHasil}</div>
+          <div style="text-align:center;font-size:28px;margin-bottom:14px">${stars}</div>
+
+          <div class="stat-grid">
+            <div class="stat"><small>Nama</small><strong style="font-size:18px">${escapeHtml(state.namaSiswa)}</strong></div>
+            <div class="stat"><small>Kelas</small><strong>${escapeHtml(state.kelasSiswa)}</strong></div>
+          </div>
+
+          <div class="notice info">
+            Nilai dan progres disimpan di <b>localStorage</b> sebagai cache offline dan akan disinkronkan ke <b>Supabase</b> saat koneksi tersedia.
+            ${state.evaluationSyncedAt ? `<br><b>✅ Hasil evaluasi sudah tersinkron ke Supabase.</b>` : `<br><b>⏳ Hasil evaluasi menunggu sinkronisasi.</b>`}
+          </div>
+
+          <div class="inline-actions" style="margin-top:14px">
+            <button id="reviewBtn" class="btn primary">LIHAT PEMBAHASAN</button>
+            <button id="retryBtn" class="btn yellow">ULANGI EVALUASI</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3 class="card-title">Penyimpanan Cloud</h3>
+          <p class="subtle">Aplikasi memakai Supabase Anonymous Auth. Selama sesi anonim pada browser ini masih tersimpan, progres dapat dimuat kembali dari cloud. Menghapus data situs/browser dapat menghapus identitas anonim lokal; gunakan perangkat/browser yang sama untuk melanjutkan sesi yang sama.</p>
+          <button id="syncNowBtn" class="btn ghost block">☁️ SINKRONKAN SEKARANG</button>
+          <div id="syncNowFeedback"></div>
+        </section>
+      </div>
+    `;
+
+    document.getElementById("reviewBtn").addEventListener("click",()=>go("pembahasan",0));
+    document.getElementById("retryBtn").addEventListener("click",()=>{
+      if(confirm("Ulangi evaluasi dari awal? Nama, kelas, dan progres materi tetap dipertahankan.")){
+        state.quizAnswers = {};
+        state.quizIndex = 0;
+        state.evaluasiSelesai = false;
+        state.nilaiAkhir = 0;
+        state.kategoriHasil = "";
+        state.evaluationAttemptId = newUuid();
+        state.evaluationSyncedAt = null;
+        saveState();
+        go("evaluasi",0);
+      }
+    });
+    document.getElementById("syncNowBtn")?.addEventListener("click", async ()=>{
+      const fb = document.getElementById("syncNowFeedback");
+      if(!navigator.onLine){
+        fb.innerHTML = `<div class="notice warn">Perangkat sedang offline. Data tetap aman di cache lokal dan akan dicoba lagi saat online.</div>`;
+        return;
+      }
+      try{
+        fb.innerHTML = `<div class="notice info">Menyinkronkan data…</div>`;
+        await pushCloudState(true);
+        await syncEvaluationResult();
+        fb.innerHTML = `<div class="notice ok">✅ Data berhasil disinkronkan ke Supabase.</div>`;
+        renderResult();
+      }catch(err){
+        console.error(err);
+        fb.innerHTML = `<div class="notice bad">⚠️ Sinkronisasi gagal. Periksa konfigurasi Supabase atau koneksi internet.</div>`;
+      }
+    });
+  }
+
+  function renderReview(){
+    setHeader("Pembahasan Evaluasi","10 soal");
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">📘 Pembahasan Evaluasi</h1>
+        <p class="section-sub">Bandingkan jawabanmu dengan konsep yang benar.</p>
+        ${quiz.map((q,i)=>{
+          const ok = answerCorrect(q);
+          return `
+            <section class="review-item">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+                <b style="color:var(--navy)">Soal ${i+1} — ${q.title}</b>
+                <span class="badge ${ok?"done":""}">${ok?"✅ Tepat":"⚠️ Perlu diperbaiki"}</span>
+              </div>
+              <p>${q.q}</p>
+              <div class="notice ${ok?"ok":"bad"}">${ok ? q.correct : q.wrong}</div>
+            </section>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function answerCorrect(q){
+    const a = state.quizAnswers[q.id];
+    if(q.type==="mc" || q.type==="tf") return a===q.answer;
+    if(q.type==="num") return approx(num(a),q.answer);
+    if(q.type==="match") return q.rows.every((r,i)=>a && a[i]===r[1]);
+    if(q.type==="order") return Array.isArray(a) && a.every((v,i)=>String(v)===String(i+1));
+    return false;
+  }
+
+  // ===============================
+  // SIMULATION / GAMES
+  // ===============================
+  function renderSimulation(){
+    setHeader("Simulator Orbit","Eksperimen");
+    markVisited("simulasi");
+    content.innerHTML = `
+      <div class="page">
+        <h1 class="section-title">🎮 Simulator & Games</h1>
+        <p class="section-sub">Aktivitas ini tidak memengaruhi nilai evaluasi.</p>
+
+        <section class="card">
+          <h2 class="card-title">Game 1 — Simulator Orbit</h2>
+          <p class="subtle">Geser jari-jari. Gunakan π = 3,14.</p>
+          <div class="slider-row">
+            <input id="radiusSlider" type="range" min="1" max="20" value="${transient.simRadius}">
+            <b id="radiusValue">r = ${transient.simRadius}</b>
+          </div>
+          <div id="simCircle" class="circle-diagram" style="width:${120+transient.simRadius*7}px;max-width:78vw"></div>
+          <div class="stat-grid">
+            <div class="stat"><small>Diameter</small><strong id="simD">${fmt(transient.simRadius*2)}</strong></div>
+            <div class="stat"><small>Keliling</small><strong id="simK">${fmt(2*3.14*transient.simRadius)}</strong></div>
+            <div class="stat"><small>Luas</small><strong id="simL">${fmt(3.14*transient.simRadius*transient.simRadius)}</strong></div>
+            <div class="stat"><small>Jari-jari</small><strong id="simR">${fmt(transient.simRadius)}</strong></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Game 2 — Pengendali Busur</h2>
+          <p class="subtle">r = 14 cm · π = 22/7</p>
+          <div class="slider-row">
+            <input id="gameAngle" type="range" min="0" max="360" step="10" value="${transient.simAngle}">
+            <b id="gameAngleVal">${transient.simAngle}°</b>
+          </div>
+          <div id="gameSector" class="sector" style="margin:12px auto;background:conic-gradient(var(--blue) 0deg ${transient.simAngle}deg,#E5EDF7 ${transient.simAngle}deg 360deg)"></div>
+          <div class="notice info" id="arcCalc">Panjang busur = ${fmt((transient.simAngle/360)*88)} cm</div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Game 3 — Bangun Juring Planet</h2>
+          <div class="hotspots">
+            ${[45,90,120,180,270].map(a=>`<button class="hotspot-btn ${a===transient.sectorAngle?"active":""}" data-sector="${a}">${a}°</button>`).join("")}
+          </div>
+          <div id="sectorGame" class="sector" style="margin:14px auto;background:conic-gradient(var(--yellow) 0deg ${transient.sectorAngle}deg,#DDEBFA ${transient.sectorAngle}deg 360deg)"></div>
+          <p><b>Apakah juring ini kurang dari setengah, tepat setengah, atau lebih dari setengah lingkaran?</b></p>
+          <div class="choice-list" id="sectorPred">
+            <button class="choice" data-pred="kurang">Kurang dari setengah</button>
+            <button class="choice" data-pred="tepat">Tepat setengah</button>
+            <button class="choice" data-pred="lebih">Lebih dari setengah</button>
+          </div>
+          <div id="sectorFeedback"></div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Game 4 — Isi Bahan Bakar Roket</h2>
+          <div class="fuel"><div id="fuelBar" style="width:${transient.fuel}%"></div></div>
+          <p style="text-align:center"><b id="fuelText">${transient.fuel}% bahan bakar</b></p>
+          <div id="fuelQuestion">${renderFuelQuestion()}</div>
+        </section>
+      </div>
+    `;
+
+    bindSimulation();
+  }
+
+  function bindSimulation(){
+    const rs = document.getElementById("radiusSlider");
+    rs.addEventListener("input",()=>{
+      transient.simRadius = +rs.value;
+      document.getElementById("radiusValue").textContent = `r = ${transient.simRadius}`;
+      document.getElementById("simR").textContent = fmt(transient.simRadius);
+      document.getElementById("simD").textContent = fmt(transient.simRadius*2);
+      document.getElementById("simK").textContent = fmt(2*3.14*transient.simRadius);
+      document.getElementById("simL").textContent = fmt(3.14*transient.simRadius*transient.simRadius);
+      document.getElementById("simCircle").style.width = `${120+transient.simRadius*7}px`;
+    });
+
+    const ga = document.getElementById("gameAngle");
+    ga.addEventListener("input",()=>{
+      transient.simAngle = +ga.value;
+      document.getElementById("gameAngleVal").textContent = `${transient.simAngle}°`;
+      document.getElementById("gameSector").style.background = `conic-gradient(var(--blue) 0deg ${transient.simAngle}deg,#E5EDF7 ${transient.simAngle}deg 360deg)`;
+      document.getElementById("arcCalc").textContent = `Panjang busur = ${fmt((transient.simAngle/360)*88)} cm`;
+    });
+
+    document.querySelectorAll("[data-sector]").forEach(b=>{
+      b.addEventListener("click",()=>{
+        transient.sectorAngle = +b.dataset.sector;
+        renderSimulation();
+      });
+    });
+
+    document.querySelectorAll("[data-pred]").forEach(b=>{
+      b.addEventListener("click",()=>{
+        const expected = transient.sectorAngle<180?"kurang":transient.sectorAngle===180?"tepat":"lebih";
+        const ok = b.dataset.pred===expected;
+        document.getElementById("sectorFeedback").innerHTML = ok
+          ? `<div class="notice ok">✅ Tepat. ${transient.sectorAngle}° ${expected==="kurang"?"kurang dari":expected==="tepat"?"sama dengan":"lebih dari"} 180°.</div>`
+          : `<div class="notice bad">⚠️ Bandingkan ${transient.sectorAngle}° dengan 180°. Setengah lingkaran adalah 180°.</div>`;
+      });
+    });
+
+    const fuelBox = document.getElementById("fuelQuestion");
+    fuelBox.addEventListener("click", (e)=>{
+      const b = e.target.closest("[data-fuel]");
+      if(!b) return;
+      const isCorrect = b.dataset.fuel==="1";
+      if(isCorrect){
+        transient.fuel = Math.min(100,transient.fuel+20);
+        transient.fuelIndex = Math.min(4,transient.fuelIndex+1);
+        document.getElementById("fuelBar").style.width = `${transient.fuel}%`;
+        document.getElementById("fuelText").textContent = `${transient.fuel}% bahan bakar`;
+        fuelBox.innerHTML = transient.fuel>=100
+          ? `<div class="notice ok">🚀 Roket siap menjelajah! Bahan bakar 100%.</div><button id="fuelReset" class="btn ghost block" style="margin-top:10px">MAIN LAGI</button>`
+          : `<div class="notice ok">✅ Benar! +20% bahan bakar.</div>${renderFuelQuestion()}`;
+        document.getElementById("fuelReset")?.addEventListener("click",()=>{
+          transient.fuel=0; transient.fuelIndex=0; renderSimulation();
+        });
+      }else{
+        fuelBox.querySelector(".notice.bad")?.remove();
+        fuelBox.insertAdjacentHTML("afterbegin",`<div class="notice bad">⚠️ Belum tepat. Coba lagi tanpa kehilangan bahan bakar.</div>`);
+      }
+    });
+  }
+
+  function renderFuelQuestion(){
+    const items = [
+      {q:"Jika r = 7 cm, berapa diameter?",opts:[["14 cm",1],["7 cm",0],["21 cm",0]]},
+      {q:"Rumus luas lingkaran adalah ...",opts:[["πr²",1],["2πr",0],["πd",0]]},
+      {q:"90° adalah berapa bagian dari 360°?",opts:[["1/4",1],["1/2",0],["1/3",0]]},
+      {q:"Sudut keliling yang menghadap diameter besarnya ...",opts:[["90°",1],["180°",0],["45°",0]]},
+      {q:"Juring adalah bagian dari ...",opts:[["luas lingkaran",1],["diameter",0],["jari-jari",0]]}
+    ];
+    const item = items[transient.fuelIndex] || items[0];
+    return `
+      <p><b>${item.q}</b></p>
+      <div class="choice-list">
+        ${item.opts.map(o=>`<button class="choice" data-fuel="${o[1]}">${o[0]}</button>`).join("")}
+      </div>`;
+  }
+
+  // ===============================
+  // NAVIGATION
+  // ===============================
+  function updateNav(){
+    if(bottomNav.classList.contains("hidden")) return;
+
+    btnMenu.disabled = state.screen==="menu";
+
+    let backDisabled = false;
+    let nextDisabled = false;
+    let nextText = "LANJUT →";
+
+    if(state.screen==="menu"){
+      backDisabled = true;
+      nextDisabled = true;
+    } else if(state.screen==="tujuan"){
+      backDisabled = false;
+      nextDisabled = false;
+    } else if(state.screen==="materi"){
+      backDisabled = state.sub<=0;
+      nextDisabled = state.sub>=materialPages.length-1;
+    } else if(state.screen==="belajar"){
+      backDisabled = state.sub<=0;
+      nextDisabled = state.sub>=learningPages.length-1;
+      // For final practice pages, encourage completion before next
+      const p = learningPages[state.sub];
+      if(p && p.type.endsWith("latihan") && !state.materiSelesai[p.key]){
+        nextDisabled = true;
+      }
+    } else if(state.screen==="evaluasi"){
+      backDisabled = state.quizIndex<=0;
+      const q = quiz[state.quizIndex];
+      nextDisabled = !isAnswered(q);
+      nextText = state.quizIndex===quiz.length-1 ? "SELESAI →" : "LANJUT →";
+    } else if(state.screen==="hasil" || state.screen==="pembahasan" || state.screen==="simulasi"){
+      nextDisabled = true;
+      backDisabled = false;
+    }
+
+    btnBack.disabled = backDisabled;
+    btnNext.disabled = nextDisabled;
+    btnNext.textContent = nextText;
+  }
+
+  btnMenu.addEventListener("click",()=>go("menu"));
+
+  btnBack.addEventListener("click",()=>{
+    if(state.screen==="tujuan") return go("menu");
+    if(state.screen==="materi") return state.sub>0 ? go("materi",state.sub-1) : go("menu");
+    if(state.screen==="belajar"){
+      transient.lessonStepCount=0; transient.practiceFeedback=""; transient.practiceAnswered=false; transient.hintLevel=0;
+      return state.sub>0 ? go("belajar",state.sub-1) : go("menu");
+    }
+    if(state.screen==="evaluasi"){
+      if(state.quizIndex>0){ state.quizIndex--; saveState(); render(); } else go("menu");
+      return;
+    }
+    if(state.screen==="hasil") return go("menu");
+    if(state.screen==="pembahasan") return go("hasil");
+    if(state.screen==="simulasi") return go("menu");
+  });
+
+  btnNext.addEventListener("click",()=>{
+    if(state.screen==="tujuan") return go("materi",0);
+
+    if(state.screen==="materi"){
+      if(state.sub<materialPages.length-1) return go("materi",state.sub+1);
+      return;
+    }
+
+    if(state.screen==="belajar"){
+      if(state.sub<learningPages.length-1){
+        markLessonIfCompleted(state.sub);
+        transient.lessonStepCount=0;
+        transient.practiceFeedback="";
+        transient.practiceAnswered=false;
+        transient.hintLevel=0;
+        return go("belajar",state.sub+1);
+      }
+      return;
+    }
+
+    if(state.screen==="evaluasi"){
+      const q = quiz[state.quizIndex];
+      if(!isAnswered(q)) return;
+      if(state.quizIndex < quiz.length-1){
+        state.quizIndex++;
+        saveState();
+        render();
+      }else{
+        if(confirm("Semua soal telah dijawab. Selesaikan evaluasi dan hitung nilai?")){
+          calculateScore();
+          go("hasil");
+        }
+      }
+    }
+  });
+
+  // Initial route
+  if(state.identitasValid && state.screen==="pembuka"){
+    // tetap izinkan pembuka jika pengguna sedang di sana
+  }
+  render();
+  initSupabase();
+})();
+</script>
+</body>
+</html>
