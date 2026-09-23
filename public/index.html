@@ -1021,6 +1021,22 @@
       border-color:rgba(123,97,255,.34);
       box-shadow:0 18px 42px rgba(4,18,46,.22);
     }
+    .menu-card-locked{
+      cursor:not-allowed;
+      opacity:.68;
+      filter:saturate(.72);
+      background:linear-gradient(145deg,rgba(246,248,252,.98),rgba(234,240,248,.95));
+      box-shadow:0 10px 24px rgba(4,18,46,.10);
+    }
+    .menu-card-locked:hover{
+      transform:none;
+      border-color:rgba(198,220,248,.9);
+      box-shadow:0 10px 24px rgba(4,18,46,.10);
+    }
+    .menu-card-locked .icon{
+      background:linear-gradient(145deg,#EEF1F5,#E1E7EF);
+      color:#6C7888;
+    }
     .menu-card .icon{
       width:46px;height:46px;
       display:grid;place-items:center;
@@ -1372,6 +1388,7 @@
     materialMatchSelected:null,
     materialMatched:{},
     materialMatchFeedback:"",
+    evalLockNotice:false,
     lessonStepCount:0,
     practiceFeedback:"",
     practiceAnswered:false,
@@ -1634,6 +1651,10 @@
     return Object.values(state.materiSelesai).filter(Boolean).length;
   }
 
+  function allPlanetsComplete(){
+    return progressCount() === 5;
+  }
+
   const planetMeta = [
     {key:"keliling", code:"Planet 1", name:"Aurelis", topic:"Keliling Lingkaran", emoji:"🪐", accent:"p1", desc:"Planet cincin biru untuk memahami panjang seluruh tepi lingkaran."},
     {key:"luas", code:"Planet 2", name:"Lumora", topic:"Luas Lingkaran", emoji:"🌕", accent:"p2", desc:"Planet bercahaya ungu untuk menghitung luas daerah di dalam lingkaran."},
@@ -1854,6 +1875,14 @@
       screen = "pembuka";
       sub = 0;
     }
+
+    // Evaluasi baru boleh dibuka setelah semua 5 planet selesai.
+    if(screen === "evaluasi" && !allPlanetsComplete()){
+      transient.evalLockNotice = true;
+      screen = "menu";
+      sub = 0;
+    }
+
     state.screen = screen;
     state.sub = sub;
     saveState();
@@ -1878,6 +1907,14 @@
     if(!state.identitasValid && !["pembuka","konfirmasi"].includes(state.screen)){
       state.screen = "pembuka";
       state.sub = 0;
+    }
+
+    // Proteksi berlapis: state lama tidak boleh langsung masuk ke evaluasi.
+    if(state.screen === "evaluasi" && !allPlanetsComplete()){
+      transient.evalLockNotice = true;
+      state.screen = "menu";
+      state.sub = 0;
+      saveStateLocalOnly();
     }
 
     const requiresShell = state.identitasValid && state.screen !== "pembuka" && state.screen !== "konfirmasi";
@@ -2041,15 +2078,40 @@
             <div class="progress-fill" style="width:${p*20}%"></div>
           </div>
           <div class="cosmic-divider"></div>
-          <div class="tiny">${p===5 ? "Semua planet sudah ditaklukkan. Saatnya meninjau atau mengulang misi." : `Planet berikutnya yang terbuka: <b>${nextMeta.code} — ${nextMeta.name}</b>.`}</div>
+          <div class="tiny">${p===5
+            ? "Semua planet sudah ditaklukkan. Evaluasi akhir sekarang terbuka."
+            : `Planet berikutnya yang terbuka: <b>${nextMeta.code} — ${nextMeta.name}</b>. Evaluasi akan terbuka setelah progres mencapai <b>5/5</b>.`
+          }</div>
         </section>
+
+        ${transient.evalLockNotice && p < 5 ? `
+          <section class="card" style="border-color:#FFE0A3;background:linear-gradient(145deg,#FFFDF5,#FFF7E2)">
+            <div class="notice warn" style="margin:0">
+              🔒 <b>Evaluasi masih terkunci.</b><br>
+              Kamu harus menyelesaikan seluruh <b>5 planet pembelajaran</b> terlebih dahulu.
+              Saat ini progresmu <b>${p}/5 planet</b>.
+            </div>
+          </section>
+        ` : ""}
+
+        ${p===5 && !state.evaluasiSelesai ? `
+          <section class="card" style="border-color:#BDE9D0;background:linear-gradient(145deg,#F7FFF9,#ECFBF2)">
+            <div class="notice ok" style="margin:0">
+              🎉 <b>Semua planet selesai!</b><br>
+              Evaluasi akhir sekarang sudah terbuka. Kamu siap memasuki Ujian Komandan.
+            </div>
+          </section>
+        ` : ""}
 
         <div class="menu-grid">
           ${menuCard("🚀","Pembuka","Sapaan dan identitas penjelajah.","pembuka",true)}
           ${menuCard("🎯","Tujuan Pembelajaran","Lihat target yang akan dikuasai.","tujuan",!!state.visited.tujuan)}
           ${menuCard("🪐","Materi Pembelajaran","Kenali unsur lingkaran dan π.","materi",!!state.visited.materi)}
           ${menuCard("🧭","Pembelajaran Bertahap",`Lanjut ke ${nextMeta.name} atau pilih planet dari submenu.`,"belajar",p>0 || state.visited.belajar)}
-          ${menuCard("📝","Evaluasi",state.evaluasiSelesai?`Nilai terakhir: ${state.nilaiAkhir}`:"10 soal bervariasi.","evaluasi",state.evaluasiSelesai)}
+          ${p===5
+            ? menuCard("📝","Evaluasi",state.evaluasiSelesai?`Nilai terakhir: ${state.nilaiAkhir}`:"Semua planet selesai. Evaluasi sudah terbuka.","evaluasi",state.evaluasiSelesai)
+            : lockedMenuCard("🔒","Evaluasi",`Terkunci. Selesaikan ${5-p} planet lagi untuk membuka evaluasi.`)
+          }
           ${menuCard("🎮","Simulator Orbit","Eksperimen jari-jari, busur, dan juring.","simulasi",!!state.visited.simulasi)}
         </div>
 
@@ -2093,6 +2155,10 @@
       </div>
     `;
 
+    // Notifikasi lock hanya ditampilkan sebagai respons terhadap percobaan akses evaluasi.
+    const hadEvalLockNotice = transient.evalLockNotice;
+    transient.evalLockNotice = false;
+
     document.querySelectorAll("[data-screen]").forEach(btn=>{
       btn.addEventListener("click",()=>{
         const s = btn.dataset.screen;
@@ -2124,6 +2190,19 @@
           <p>${desc}</p>
         </div>
         <div><span class="badge ${done?"done":""}">${done?"✅ Sudah dibuka":"Buka"}</span></div>
+      </button>
+    `;
+  }
+
+  function lockedMenuCard(icon,title,desc){
+    return `
+      <button class="menu-card menu-card-locked" type="button" disabled aria-label="${title} terkunci">
+        <div>
+          <div class="icon">${icon}</div>
+          <h3>${title}</h3>
+          <p>${desc}</p>
+        </div>
+        <div><span class="badge">🔒 Terkunci</span></div>
       </button>
     `;
   }
@@ -2818,6 +2897,12 @@
   // QUIZ
   // ===============================
   function renderQuiz(){
+    if(!allPlanetsComplete()){
+      transient.evalLockNotice = true;
+      go("menu");
+      return;
+    }
+
     setHeader("Evaluasi — Ujian Komandan",`${Math.min(state.quizIndex+1,10)}/10`);
     markVisited("evaluasi");
 
